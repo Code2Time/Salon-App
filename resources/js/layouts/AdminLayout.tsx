@@ -1,16 +1,35 @@
 import { useState } from "react";
-import { Drawer, IconButton, useMediaQuery, useTheme } from "@mui/material";
-import { ArrowUpLeft, Menu, X, Sprout } from "lucide-react";
+import { Avatar, Drawer, IconButton, Tooltip, useMediaQuery, useTheme } from "@mui/material";
+import { ArrowLeftRight, ArrowUpLeft, Menu, X, Sprout } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router";
 import Brand from "../components/layout/Brand";
 import Navigation from "../components/layout/Navigation";
 import { panelNavigation } from "../routes/navigation";
+import { useAuth } from "../auth/AuthContext";
+import { useNavigate } from "react-router";
+import { Button } from "@mui/material";
+import { toast } from "react-toastify";
+import { readableApiError } from "../services/api/client";
 
 export default function AdminLayout() {
     const [menuOpen, setMenuOpen] = useState(false);
     const desktop = useMediaQuery(useTheme().breakpoints.up("lg"));
     const { pathname } = useLocation();
-    const current = panelNavigation.find((item) => item.path === pathname);
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
+    const membershipRole = user?.memberships[0]?.role;
+    const visibleNavigation = panelNavigation.filter((item) =>
+        user?.system_role === "super_admin" || !item.roles || (membershipRole && item.roles.includes(membershipRole)),
+    );
+    const current = visibleNavigation.find((item) => item.path === pathname);
+    async function handleLogout() {
+        try {
+            await logout();
+            navigate("/login");
+        } catch (error) {
+            toast.error(readableApiError(error));
+        }
+    }
     const sidebar = (
         <div className="sidebar-content">
             <div className="sidebar-brand">
@@ -30,7 +49,7 @@ export default function AdminLayout() {
             </div>
             <p className="nav-caption">میز کار شما</p>
             <Navigation
-                items={panelNavigation}
+                items={visibleNavigation}
                 label="منوی پنل مدیریت"
                 className="panel-navigation"
                 onNavigate={() => setMenuOpen(false)}
@@ -41,9 +60,9 @@ export default function AdminLayout() {
                     <strong>فضایی برای رشد شما</strong>
                     <p>با نظم بیشتر، برای زیبایی وقت بگذارید.</p>
                 </div>
-                <Link to="/app" className="text-link">
-                    پیش‌نمایش اپ مشتری <ArrowUpLeft size={18} />
-                </Link>
+                <Button color="inherit" onClick={handleLogout}>
+                    خروج از حساب <ArrowUpLeft size={18} />
+                </Button>
             </div>
         </div>
     );
@@ -88,9 +107,21 @@ export default function AdminLayout() {
                             <strong>{current?.label ?? "صفحه پیدا نشد"}</strong>
                         </span>
                     </div>
-                    <span className="preview-badge">
-                        <span className="status-dot" /> پیش‌نمایش پنل
-                    </span>
+                    <div className="header-account">
+                        {user?.system_role === "super_admin" && (
+                            <Tooltip title="رفتن به اپ مشتری">
+                                <IconButton component={Link} to="/app" aria-label="رفتن به اپ مشتری" className="layout-switch">
+                                    <ArrowLeftRight size={19} />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                        <span className="preview-badge user-badge">
+                            <Avatar src={user?.image_url ?? undefined} alt={user?.name} className="header-avatar">
+                                {user?.name?.trim().charAt(0)}
+                            </Avatar>
+                            <span className="user-name">{user?.name}</span>
+                        </span>
+                    </div>
                 </header>
                 <main id="main-content" tabIndex={-1} className="admin-main">
                     <Outlet />

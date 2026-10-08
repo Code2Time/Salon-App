@@ -1,12 +1,27 @@
 import { Link, Outlet, useLocation } from "react-router";
-import { ArrowUpLeft } from "lucide-react";
+import { ArrowLeftRight, ArrowUpLeft } from "lucide-react";
 import Brand from "../components/layout/Brand";
 import Navigation from "../components/layout/Navigation";
 import { customerNavigation } from "../routes/navigation";
+import { Avatar, Button, IconButton, Tooltip } from "@mui/material";
+import { useAuth } from "../auth/AuthContext";
+import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
+import { readableApiError } from "../services/api/client";
 
 export default function CustomerLayout() {
     const { pathname } = useLocation();
     const current = customerNavigation.find((item) => item.path === pathname);
+    const { user, loading, logout } = useAuth();
+    const navigate = useNavigate();
+    async function handleLogout() {
+        try {
+            await logout();
+            navigate("/login");
+        } catch (error) {
+            toast.error(readableApiError(error));
+        }
+    }
     return (
         <div className="customer-shell">
             <a className="skip-link" href="#main-content">
@@ -15,9 +30,37 @@ export default function CustomerLayout() {
             <header className="customer-header">
                 <div className="customer-header-inner">
                     <Brand customer />
-                    <Link to="/" className="preview-return">
-                        پیش‌نمایش‌ها <ArrowUpLeft size={17} />
-                    </Link>
+                    <div className="header-account">
+                        {user?.system_role === "super_admin" && (
+                            <Tooltip title="رفتن به پنل مدیریت">
+                                <IconButton component={Link} to="/panel" aria-label="رفتن به پنل مدیریت" className="layout-switch">
+                                    <ArrowLeftRight size={19} />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                        {user ? (
+                            <>
+                                <span className="preview-badge user-badge">
+                                    <Avatar src={user.image_url ?? undefined} alt={user.name} className="header-avatar">
+                                        {user.name.trim().charAt(0)}
+                                    </Avatar>
+                                    <span className="user-name">{user.name}</span>
+                                </span>
+                                <Button className="preview-return" color="inherit" onClick={handleLogout}>
+                                    خروج <ArrowUpLeft size={17} />
+                                </Button>
+                            </>
+                        ) : !loading ? (
+                            <>
+                                <Button component={Link} to="/login" variant="contained" size="small">
+                                    ورود
+                                </Button>
+                                <Button component={Link} to="/register" color="inherit" size="small">
+                                    ثبت‌نام
+                                </Button>
+                            </>
+                        ) : null}
+                    </div>
                 </div>
             </header>
             <Navigation
