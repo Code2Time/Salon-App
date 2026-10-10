@@ -9,7 +9,7 @@ export interface ProfileInput {
     image?: File;
 }
 
-export async function updateProfile(input: ProfileInput): Promise<AuthUser> {
+async function submitProfile(input: ProfileInput, endpoint: string): Promise<AuthUser> {
     await initializeCsrf();
     const data = new FormData();
     data.append("first_name", input.first_name);
@@ -18,6 +18,14 @@ export async function updateProfile(input: ProfileInput): Promise<AuthUser> {
     if (input.birth_date) data.append("birth_date", input.birth_date);
     if (input.image) data.append("image", input.image);
 
-    const response = await api.post<{ data: AuthUser }>("/panel/profile", data);
+    const response = await api.post<{ data: AuthUser }>(endpoint, data);
     return response.data.data;
+}
+
+export function updateProfile(input: ProfileInput): Promise<AuthUser> {
+    return submitProfile(input, "/panel/profile");
+}
+
+export function updateCustomerProfile(input: ProfileInput): Promise<AuthUser> {
+    return submitProfile(input, "/profile");
 }

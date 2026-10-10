@@ -78,7 +78,7 @@ class SalonUserController extends Controller
             $salon->users()->attach($user->id, [
                 'role' => $data['role'],
                 'permissions' => $data['role'] === SalonRole::Employee->value
-                    ? ($data['permissions'] ?? ['dashboard', 'appointments'])
+                    ? $this->normalizedPermissions($data['permissions'] ?? ['dashboard', 'appointments'])
                     : null,
                 'is_active' => $data['is_active'] ?? true,
             ]);
@@ -114,7 +114,7 @@ class SalonUserController extends Controller
             $context->get()->users()->updateExistingPivot($member->id, [
                 'role' => $data['role'],
                 'permissions' => $data['role'] === SalonRole::Employee->value
-                    ? ($data['permissions'] ?? [])
+                    ? $this->normalizedPermissions($data['permissions'] ?? [])
                     : null,
                 'is_active' => $data['is_active'],
             ]);
@@ -162,5 +162,16 @@ class SalonUserController extends Controller
         if ($owners <= 1) {
             throw ValidationException::withMessages(['role' => 'آخرین مالک فعال سالن قابل غیرفعال‌سازی یا تغییر نقش نیست.']);
         }
+    }
+
+    /** @param array<int, string> $permissions */
+    private function normalizedPermissions(array $permissions): array
+    {
+        if (in_array('manage_service_categories', $permissions, true)
+            && ! in_array('service_categories', $permissions, true)) {
+            $permissions[] = 'service_categories';
+        }
+
+        return array_values(array_unique($permissions));
     }
 }

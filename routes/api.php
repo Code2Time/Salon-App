@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Api\Auth\OtpAuthController;
 use App\Http\Controllers\Api\Auth\SessionController;
-use App\Http\Controllers\Api\Panel\ProfileController;
+use App\Http\Controllers\Api\Panel\ProfileController as PanelProfileController;
 use App\Http\Controllers\Api\Panel\SalonUserController;
+use App\Http\Controllers\Api\Panel\ServiceCategoryController;
+use App\Http\Controllers\Api\ProfileController as CustomerProfileController;
 use App\Services\CurrentSalon;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +19,9 @@ Route::prefix('auth')->group(function () {
     });
 });
 
+Route::post('/profile', [CustomerProfileController::class, 'update'])
+    ->middleware('auth:sanctum');
+
 Route::get('/panel/context', fn (CurrentSalon $context) => response()->json([
     'data' => ['salon_id' => $context->get()->id, 'salon_name' => $context->get()->name],
 ]))->middleware(['auth:sanctum', 'panel', 'salon']);
@@ -24,5 +29,15 @@ Route::get('/panel/context', fn (CurrentSalon $context) => response()->json([
 Route::apiResource('/panel/users', SalonUserController::class)
     ->middleware(['auth:sanctum', 'panel', 'salon', 'manage-salon-users']);
 
-Route::post('/panel/profile', [ProfileController::class, 'update'])
+Route::post('/panel/profile', [PanelProfileController::class, 'update'])
     ->middleware(['auth:sanctum', 'panel']);
+
+Route::middleware(['auth:sanctum', 'panel', 'salon'])->prefix('/panel/service-categories')->group(function () {
+    Route::get('/', [ServiceCategoryController::class, 'index'])->middleware('service-categories');
+    Route::get('/{service_category}', [ServiceCategoryController::class, 'show'])->middleware('service-categories');
+    Route::get('/{service_category}/deletion-impact', [ServiceCategoryController::class, 'deletionImpact'])
+        ->middleware('service-categories:manage');
+    Route::post('/', [ServiceCategoryController::class, 'store'])->middleware('service-categories:manage');
+    Route::post('/{service_category}', [ServiceCategoryController::class, 'update'])->middleware('service-categories:manage');
+    Route::delete('/{service_category}', [ServiceCategoryController::class, 'destroy'])->middleware('service-categories:manage');
+});

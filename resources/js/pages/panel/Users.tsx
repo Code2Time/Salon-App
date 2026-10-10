@@ -44,7 +44,8 @@ const roleLabels: Record<SalonRole, string> = {
 const assignableRoles: SalonRole[] = ["salon_owner", "employee", "customer"];
 const permissionOptions: Array<{ value: PanelPermission; label: string }> = [
     { value: "dashboard", label: "داشبورد" },
-    { value: "service_categories", label: "دسته‌بندی خدمات" },
+    { value: "service_categories", label: "مشاهده دسته‌بندی خدمات" },
+    { value: "manage_service_categories", label: "مدیریت دسته‌بندی خدمات" },
     { value: "services", label: "خدمات" },
     { value: "appointments", label: "نوبت‌ها" },
     { value: "products", label: "محصولات" },
@@ -297,12 +298,18 @@ export default function Users({
                                         control={
                                             <Checkbox
                                                 checked={form.permissions.includes(option.value)}
-                                                onChange={(event) => setForm({
-                                                    ...form,
-                                                    permissions: event.target.checked
+                                                onChange={(event) => {
+                                                    let permissions = event.target.checked
                                                         ? [...form.permissions, option.value]
-                                                        : form.permissions.filter((permission) => permission !== option.value),
-                                                })}
+                                                        : form.permissions.filter((permission) => permission !== option.value);
+                                                    if (option.value === "manage_service_categories" && event.target.checked) {
+                                                        permissions = [...permissions, "service_categories"];
+                                                    }
+                                                    if (option.value === "service_categories" && !event.target.checked) {
+                                                        permissions = permissions.filter((permission) => permission !== "manage_service_categories");
+                                                    }
+                                                    setForm({ ...form, permissions: [...new Set(permissions)] });
+                                                }}
                                             />
                                         }
                                     />

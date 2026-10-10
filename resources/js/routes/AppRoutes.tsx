@@ -14,6 +14,8 @@ import HomeRedirect from "../pages/auth/HomeRedirect";
 import PanelPageAccess from "../components/auth/PanelPageAccess";
 import Users from "../pages/panel/Users";
 import Profile from "../pages/panel/Profile";
+import CustomerProfile from "../pages/customer/Profile";
+import ServiceCategories from "../pages/panel/ServiceCategories";
 
 const protectedCustomerPaths = new Set(["/app/booking", "/app/appointments", "/app/profile"]);
 
@@ -51,7 +53,8 @@ export default function AppRoutes() {
                 <Route path="customers" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/customers")!}><Users fixedRole="customer" title="مشتریان" eyebrow="همراهان سالن" description="اطلاعات مشتریان سالن را جستجو، ایجاد و مدیریت کنید." /></PanelPageAccess>} />
                 <Route path="employees" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/employees")!}><Users fixedRole="employee" title="کارکنان" eyebrow="تیم سالن" description="اعضای تیم و وضعیت دسترسی آن‌ها را مدیریت کنید." /></PanelPageAccess>} />
                 <Route path="profile" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/profile")!}><Profile /></PanelPageAccess>} />
-                {panelNavigation.slice(1).filter((item) => !["/panel/users", "/panel/customers", "/panel/employees", "/panel/profile"].includes(item.path)).map((item) => (
+                <Route path="service-categories" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/service-categories")!}><ServiceCategories /></PanelPageAccess>} />
+                {panelNavigation.slice(1).filter((item) => !["/panel/users", "/panel/customers", "/panel/employees", "/panel/profile", "/panel/service-categories"].includes(item.path)).map((item) => (
                     <Route
                         key={item.path}
                         path={item.path.slice("/panel/".length)}
@@ -66,7 +69,8 @@ export default function AppRoutes() {
             </Route>
             <Route path="/app" element={<CustomerLayout />}>
                 <Route index element={<Home />} />
-                {customerNavigation.slice(1).map((item) => (
+                <Route path="profile" element={<RouteAccess area="customer"><CustomerProfile /></RouteAccess>} />
+                {customerNavigation.slice(1).filter((item) => item.path !== "/app/profile").map((item) => (
                     <Route
                         key={item.path}
                         path={item.path.slice("/app/".length)}

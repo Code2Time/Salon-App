@@ -20,15 +20,21 @@
 | 01 | [Panel & Customer Layouts](tasks/01-foundation.md) | done | پیاده‌سازی، Build، Type-check و بررسی مرورگر موفق |
 | 01b | [API & Auth](tasks/01b-api-auth.md) | done | OTP توسعه‌ای، Session/Sanctum، نقش‌ها، سالن و کنترل Layout/API |
 | 01c | [Database Error Logging](tasks/01c-error-logging.md) | done | ثبت مرکزی و امن خطاهای ۵۰۰ به بالا در دیتابیس |
-| 02 | [Salon Management](tasks/02-salon-management.md) | in_progress | زیرتسک 02a کاربران پنل پیاده‌سازی شد؛ مشتریان، خدمات و ساعات کاری باقی است |
+| 02 | [Salon Management](tasks/02-salon-management.md) | in_progress | زیرتسک‌های کاربران و دسته‌بندی خدمات تکمیل شدند؛ خدمات، ساعات کاری و تنظیمات سالن باقی است |
 | 03 | [Appointments](tasks/03-appointments.md) | not_started | وابسته به 02 |
 | 04 | [Payments](tasks/04-payments.md) | not_started | وابسته به 03 و تصمیم درگاه |
-| 05 | [Customer App](tasks/05-customer-app.md) | not_started | وابسته به 03 و مسیر پیش‌پرداخت 04 |
+| 05 | [Customer App](tasks/05-customer-app.md) | in_progress | پروفایل مشتری تکمیل شد؛ خدمات، رزرو، نوبت‌ها و اعلان‌ها باقی است |
 | 06 | [Advanced Features](tasks/06-advanced-features.md) | needs_scoping | انتخاب زیرکار پیش از اجرا ضروری است |
 
 وضعیت‌های مجاز: `not_started`، `in_progress`، `blocked`، `done`، `needs_scoping`.
 
 ## آخرین تحویل
+
+- تاریخ: 2026-10-10؛ زیرتسک `02b-service-categories` تکمیل شد. CRUD دسته‌بندی در `/panel/service-categories` شامل تصویر، توضیح، ویژه/فعال، ترتیب، جستجو، فیلتر و Pagination پیاده شد. مدل دسته‌بندی و خدمت با pivot چندبه‌چند و Soft Delete ایجاد شدند؛ CRUD خدمات هنوز خارج از این زیرتسک است. Dialog حذف نام خدمات مرتبط را نشان می‌دهد؛ خدمات مشترک حفظ و فقط خدمات بدون دسته دیگر Soft Delete می‌شوند. مجوز مشاهده `service_categories` از مدیریت `manage_service_categories` جدا و در Frontend و Backend enforce شد. migration روی دیتابیس توسعه اجرا شد؛ ۶ Route ثبت شد، PHPUnit با ۳۷ تست و ۱۸۸ assertion، Pint روی ۸۲ فایل، Type-check، Build و `git diff --check` موفق‌اند.
+- اصلاح UI دسته‌بندی: رنگ متن و پس‌زمینه Chipهای «ویژه»، «فعال» و «غیرفعال» برای کنتراست خوانا صریح شد و Dialog جزئیات، خدمات مرتبط را با نام، مدت و وضعیت نمایش می‌دهد.
+- اصلاح فیلتر دسته‌بندی: مقدار فیلتر «ویژه/عادی» در Query String از boolean متنی به `1/0` تبدیل شد تا با Validation لاراول سازگار باشد؛ تست اختصاصی دسته‌بندی با ۴ تست و ۳۵ assertion و Build فرانت موفق‌اند.
+
+- تاریخ: 2026-10-10؛ زیرقابلیت پروفایل مشتری از فاز 05 پیاده‌سازی شد. صفحه محافظت‌شده `/app/profile` امکان ویرایش نام، نام خانوادگی، ایمیل، تاریخ تولد با تقویم جلالی و تصویر را دارد؛ موبایل تأییدشده فقط خواندنی است. API مالکیت‌محور `/api/profile` بدون نیاز به دسترسی پنل فقط User احرازشده را تغییر می‌دهد و منطق ذخیره/جایگزینی تصویر با پروفایل پنل مشترک شده است. Header پس از ذخیره بدون Reload به‌روز می‌شود. PHPUnit با ۳۳ تست و ۱۵۳ assertion، Pint روی ۷۳ فایل، Type-check، Build و `git diff --check` موفق‌اند. فاز 05 به دلیل باقی‌بودن خدمات، رزرو، نوبت‌ها و اعلان‌ها همچنان `in_progress` است.
 
 - تاریخ: 2026-10-10؛ تسک `01c-error-logging` تکمیل شد. جدول `error_logs`، مدل و Reporter مرکزی اضافه و migration روی دیتابیس توسعه اجرا شد. خطاهای ۵۰۰ به بالا همراه شناسه پیگیری، زمینه کاربر/سالن و Stack Trace ثبت می‌شوند؛ request body، query string و headerها ذخیره نمی‌شوند و مقادیر حساس رایج و موبایل در پیام پوشانده می‌شوند. خطاهای عادی ۴xx نادیده گرفته می‌شوند و شکست خود Reporter چرخه Exception ایجاد نمی‌کند. کل PHPUnit با ۳۰ تست و ۱۳۷ assertion و Pint روی ۶۹ فایل موفق‌اند.
 - اصلاح ثبت خطا: خطاهای مهم جریان تأیید OTP، از جمله کد اشتباه، منقضی یا مصرف‌شده، اکنون با وضعیت ۴۲۲ ثبت می‌شوند؛ کد OTP و payload درخواست در رکورد قرار نمی‌گیرند. سایر validationهای عمومی همچنان نادیده گرفته می‌شوند.

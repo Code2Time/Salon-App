@@ -1,5 +1,5 @@
 export type SalonRole = "salon_owner" | "employee" | "customer";
-export type PanelPermission = "dashboard" | "service_categories" | "services" | "appointments" | "products" | "reports";
+export type PanelPermission = "dashboard" | "service_categories" | "manage_service_categories" | "services" | "appointments" | "products" | "reports";
 
 export interface Membership {
     salon_id: number;
