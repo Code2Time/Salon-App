@@ -5,11 +5,11 @@ namespace App\Enums;
 enum SalonRole: string
 {
     case Owner = 'salon_owner';
-    case Manager = 'manager';
     case Employee = 'employee';
+    case Customer = 'customer';
 
     public function canAccessPanel(): bool
     {
-        return true;
+        return $this !== self::Customer;
     }
 }

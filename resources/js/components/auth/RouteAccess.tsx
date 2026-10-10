@@ -1,7 +1,7 @@
-import { CircularProgress } from "@mui/material";
 import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router";
 import { useAuth } from "../../auth/AuthContext";
+import AppLoading from "../common/AppLoading";
 
 export default function RouteAccess({ area, children }: {
     area: "panel" | "customer";
@@ -11,7 +11,7 @@ export default function RouteAccess({ area, children }: {
     const location = useLocation();
 
     if (loading) {
-        return <div className="auth-loading"><CircularProgress aria-label="در حال بررسی ورود" /></div>;
+        return <AppLoading />;
     }
     if (!user) {
         return <Navigate to="/login" replace state={{ from: location.pathname + location.search + location.hash }} />;

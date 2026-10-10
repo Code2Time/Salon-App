@@ -12,6 +12,8 @@ import RouteAccess from "../components/auth/RouteAccess";
 import AuthPage from "../pages/auth/AuthPage";
 import HomeRedirect from "../pages/auth/HomeRedirect";
 import PanelPageAccess from "../components/auth/PanelPageAccess";
+import Users from "../pages/panel/Users";
+import Profile from "../pages/panel/Profile";
 
 const protectedCustomerPaths = new Set(["/app/booking", "/app/appointments", "/app/profile"]);
 
@@ -45,7 +47,11 @@ export default function AppRoutes() {
                 }
             >
                 <Route index element={<Dashboard />} />
-                {panelNavigation.slice(1).map((item) => (
+                <Route path="users" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/users")!}><Users /></PanelPageAccess>} />
+                <Route path="customers" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/customers")!}><Users fixedRole="customer" title="مشتریان" eyebrow="همراهان سالن" description="اطلاعات مشتریان سالن را جستجو، ایجاد و مدیریت کنید." /></PanelPageAccess>} />
+                <Route path="employees" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/employees")!}><Users fixedRole="employee" title="کارکنان" eyebrow="تیم سالن" description="اعضای تیم و وضعیت دسترسی آن‌ها را مدیریت کنید." /></PanelPageAccess>} />
+                <Route path="profile" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/profile")!}><Profile /></PanelPageAccess>} />
+                {panelNavigation.slice(1).filter((item) => !["/panel/users", "/panel/customers", "/panel/employees", "/panel/profile"].includes(item.path)).map((item) => (
                     <Route
                         key={item.path}
                         path={item.path.slice("/panel/".length)}

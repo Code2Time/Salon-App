@@ -8,6 +8,7 @@ use App\Http\Requests\Auth\VerifyOtpRequest;
 use App\Http\Resources\CurrentUserResource;
 use App\Models\OtpChallenge;
 use App\Models\User;
+use App\Services\Errors\DatabaseExceptionReporter;
 use App\Services\Otp\OtpSender;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -53,24 +54,24 @@ class OtpAuthController extends Controller
             ->first();
 
         if (! $challenge || $challenge->expires_at->isPast()) {
-            throw ValidationException::withMessages(['code' => 'کد ورود منقضی شده است؛ کد جدید بگیرید.']);
+            $this->throwOtpError('code', 'کد ورود منقضی شده است؛ کد جدید بگیرید.');
         }
         if ($challenge->attempts >= (int) config('otp.max_attempts')) {
-            throw ValidationException::withMessages(['code' => 'تعداد تلاش مجاز تمام شده است؛ کد جدید بگیرید.']);
+            $this->throwOtpError('code', 'تعداد تلاش مجاز تمام شده است؛ کد جدید بگیرید.');
         }
         if (! Hash::check($data['code'], $challenge->code_hash)) {
             $challenge->increment('attempts');
-            throw ValidationException::withMessages(['code' => 'کد ورود صحیح نیست.']);
+            $this->throwOtpError('code', 'کد ورود صحیح نیست.');
         }
 
         $user = DB::transaction(function () use ($data, $challenge) {
             $user = User::query()->where('mobile', $data['mobile'])->first();
 
             if (! $user && $data['mode'] !== 'register') {
-                throw ValidationException::withMessages(['mobile' => 'حسابی با این شماره پیدا نشد؛ ابتدا ثبت‌نام کنید.']);
+                $this->throwOtpError('mobile', 'حسابی با این شماره پیدا نشد؛ ابتدا ثبت‌نام کنید.');
             }
             if ($user && $data['mode'] === 'register') {
-                throw ValidationException::withMessages(['mobile' => 'این شماره قبلاً ثبت شده است؛ وارد حساب شوید.']);
+                $this->throwOtpError('mobile', 'این شماره قبلاً ثبت شده است؛ وارد حساب شوید.');
             }
             if (! $user) {
                 $firstName = trim($data['first_name']);
@@ -85,7 +86,7 @@ class OtpAuthController extends Controller
                 ]);
             }
             if (! $user->is_active) {
-                throw ValidationException::withMessages(['mobile' => 'این حساب غیرفعال است.']);
+                $this->throwOtpError('mobile', 'این حساب غیرفعال است.');
             }
 
             $challenge->update(['consumed_at' => now()]);
@@ -101,5 +102,13 @@ class OtpAuthController extends Controller
             'message' => $data['mode'] === 'register' ? 'حساب شما ساخته شد.' : 'با موفقیت وارد شدید.',
             'user' => new CurrentUserResource($user),
         ]);
+    }
+
+    private function throwOtpError(string $field, string $message): never
+    {
+        $exception = ValidationException::withMessages([$field => $message]);
+        app(DatabaseExceptionReporter::class)->report($exception);
+
+        throw $exception;
     }
 }

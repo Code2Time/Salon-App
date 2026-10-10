@@ -27,7 +27,7 @@ class RoleAndSalonAccessTest extends TestCase
             Salon::create(['name' => 'سالن دیگر', 'slug' => 'other']),
         ];
         $manager = User::factory()->create();
-        $ownSalon->users()->attach($manager, ['role' => SalonRole::Manager->value]);
+        $ownSalon->users()->attach($manager, ['role' => SalonRole::Employee->value]);
 
         $this->actingAs($manager)
             ->withHeader('X-Salon-ID', (string) $ownSalon->id)

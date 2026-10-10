@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router";
-import { ArrowLeftRight, ArrowUpLeft } from "lucide-react";
+import { ArrowLeftRight, ArrowUpLeft, ChevronDown } from "lucide-react";
 import Brand from "../components/layout/Brand";
 import Navigation from "../components/layout/Navigation";
 import { customerNavigation } from "../routes/navigation";
@@ -8,6 +8,7 @@ import { useAuth } from "../auth/AuthContext";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { readableApiError } from "../services/api/client";
+import { defaultAvatarUrl } from "../constants/assets";
 
 export default function CustomerLayout() {
     const { pathname } = useLocation();
@@ -40,12 +41,14 @@ export default function CustomerLayout() {
                         )}
                         {user ? (
                             <>
-                                <span className="preview-badge user-badge">
-                                    <Avatar src={user.image_url ?? undefined} alt={user.name} className="header-avatar">
-                                        {user.name.trim().charAt(0)}
-                                    </Avatar>
-                                    <span className="user-name">{user.name}</span>
-                                </span>
+                                <Link to="/app/profile" className="account-profile-link" aria-label="مشاهده پروفایل من">
+                                    <span className="account-profile-copy">
+                                        <strong>{user.name}</strong>
+                                        <small>{user.system_role === "super_admin" ? "مدیر کل" : "حساب مشتری"}</small>
+                                    </span>
+                                    <Avatar src={user.image_url ?? defaultAvatarUrl} alt={user.name} className="header-avatar" />
+                                    <ChevronDown size={15} className="account-profile-chevron" aria-hidden="true" />
+                                </Link>
                                 <Button className="preview-return" color="inherit" onClick={handleLogout}>
                                     خروج <ArrowUpLeft size={17} />
                                 </Button>

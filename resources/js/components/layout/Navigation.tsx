@@ -21,6 +21,7 @@ export default function Navigation({
                     key={path}
                     to={path}
                     end
+                    title={title}
                     onClick={onNavigate}
                     className={({ isActive }) =>
                         `nav-item${isActive ? " active" : ""}`

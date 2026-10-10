@@ -1,9 +1,11 @@
-export type SalonRole = "salon_owner" | "manager" | "employee";
+export type SalonRole = "salon_owner" | "employee" | "customer";
+export type PanelPermission = "dashboard" | "service_categories" | "services" | "appointments" | "products" | "reports";
 
 export interface Membership {
     salon_id: number;
     salon_name: string;
     role: SalonRole;
+    permissions: PanelPermission[];
 }
 
 export interface AuthUser {

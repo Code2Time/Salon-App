@@ -8,6 +8,10 @@ import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 import rtlPlugin from "@mui/stylis-plugin-rtl";
 import { prefixer } from "stylis";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFnsJalali } from "@mui/x-date-pickers/AdapterDateFnsJalali";
+import { faIR } from "@mui/x-date-pickers/locales";
+import type { PickersInputLocaleText } from "@mui/x-date-pickers/locales";
 import "@fontsource/vazirmatn/400.css";
 import "@fontsource/vazirmatn/500.css";
 import "@fontsource/vazirmatn/600.css";
@@ -20,14 +24,24 @@ const rtlCache = createCache({
     stylisPlugins: [prefixer, rtlPlugin],
 });
 
+const persianPickerLocale = Object.fromEntries(
+    Object.entries(faIR.components.MuiLocalizationProvider.defaultProps.localeText)
+        .filter(([, value]) => value !== undefined),
+) as PickersInputLocaleText;
+
 const root = createRoot(document.getElementById("app")!);
 
 root.render(
     <React.StrictMode>
         <CacheProvider value={rtlCache}>
             <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <App />
+                <LocalizationProvider
+                    dateAdapter={AdapterDateFnsJalali}
+                    localeText={persianPickerLocale}
+                >
+                    <CssBaseline />
+                    <App />
+                </LocalizationProvider>
             </ThemeProvider>
         </CacheProvider>
     </React.StrictMode>,

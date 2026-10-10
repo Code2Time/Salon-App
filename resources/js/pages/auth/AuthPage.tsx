@@ -1,4 +1,4 @@
-import { Alert, Button, Paper, TextField, Typography } from "@mui/material";
+import { Button, Paper, TextField, Typography } from "@mui/material";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import type { FormEvent } from "react";
@@ -70,9 +70,6 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
                             : "پس از ورود، فضای مناسب نقش شما باز می‌شود."}
                     </Typography>
                 </div>
-                {step === "code" && import.meta.env.DEV && (
-                    <Alert severity="info">کد آزمایشی در محیط توسعه: ۱۱۱۱</Alert>
-                )}
                 <form onSubmit={submit} className="auth-form">
                     {mode === "register" && step === "details" && (
                         <div className="auth-name-fields">

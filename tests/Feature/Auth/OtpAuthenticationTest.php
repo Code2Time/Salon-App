@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\ErrorLog;
 use App\Models\OtpChallenge;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -72,6 +73,12 @@ class OtpAuthenticationTest extends TestCase
 
         $this->withHeaders($this->statefulHeaders)->postJson('/api/auth/otp/verify', $payload)
             ->assertUnprocessable()->assertJsonValidationErrors('code');
+
+        $error = ErrorLog::query()->sole();
+        $this->assertSame(422, $error->status_code);
+        $this->assertSame('/api/auth/otp/verify', $error->request_path);
+        $this->assertSame('کد ورود صحیح نیست.', $error->message);
+        $this->assertStringNotContainsString('2222', $error->message);
 
         $payload['code'] = '1111';
         $this->withHeaders($this->statefulHeaders)->postJson('/api/auth/otp/verify', $payload)->assertOk();

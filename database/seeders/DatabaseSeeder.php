@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         $users = [
             ['mobile' => '09111111001', 'first_name' => 'مدیر کل', 'last_name' => 'آزمایشی', 'system_role' => SystemRole::SuperAdmin],
             ['mobile' => '09111111002', 'first_name' => 'مالک', 'last_name' => 'آزمایشی', 'role' => SalonRole::Owner],
-            ['mobile' => '09111111003', 'first_name' => 'مدیر', 'last_name' => 'آزمایشی', 'role' => SalonRole::Manager],
+            ['mobile' => '09111111003', 'first_name' => 'مدیر دوم', 'last_name' => 'آزمایشی', 'role' => SalonRole::Owner],
             ['mobile' => '09111111004', 'first_name' => 'کارمند', 'last_name' => 'آزمایشی', 'role' => SalonRole::Employee],
             ['mobile' => '09111111005', 'first_name' => 'مشتری', 'last_name' => 'آزمایشی'],
         ];

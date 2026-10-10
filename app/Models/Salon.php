@@ -20,7 +20,7 @@ class Salon extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)
-            ->withPivot(['role', 'is_active'])
+            ->withPivot(['role', 'permissions', 'is_active'])
             ->withTimestamps()
             ->using(SalonUser::class);
     }

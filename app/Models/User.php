@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
+use App\Enums\SalonRole;
 use App\Enums\SystemRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -63,7 +65,7 @@ class User extends Authenticatable
     public function salons(): BelongsToMany
     {
         return $this->belongsToMany(Salon::class)
-            ->withPivot(['role', 'is_active'])
+            ->withPivot(['role', 'permissions', 'is_active'])
             ->withTimestamps()
             ->using(SalonUser::class);
     }
@@ -77,6 +79,10 @@ class User extends Authenticatable
     {
         return $this->isSuperAdmin() || $this->salons()
             ->wherePivot('is_active', true)
+            ->wherePivotIn('role', [
+                SalonRole::Owner->value,
+                SalonRole::Employee->value,
+            ])
             ->where('salons.is_active', true)
             ->exists();
     }

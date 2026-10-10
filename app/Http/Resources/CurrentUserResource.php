@@ -19,8 +19,11 @@ class CurrentUserResource extends JsonResource
             'role' => $salon->pivot->role instanceof SalonRole
                 ? $salon->pivot->role->value
                 : $salon->pivot->role,
+            'permissions' => $salon->pivot->permissions ?? [],
         ])->values();
-        $panelAccess = $this->isSuperAdmin() || $memberships->isNotEmpty();
+        $panelAccess = $this->isSuperAdmin() || $memberships->contains(
+            fn (array $membership) => $membership['role'] !== SalonRole::Customer->value,
+        );
         $imageUrl = $this->image && Str::startsWith($this->image, ['http://', 'https://', '/'])
             ? $this->image
             : ($this->image ? Storage::url($this->image) : null);

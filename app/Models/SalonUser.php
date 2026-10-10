@@ -13,6 +13,7 @@ class SalonUser extends Pivot
     {
         return [
             'role' => SalonRole::class,
+            'permissions' => 'array',
             'is_active' => 'boolean',
         ];
     }
