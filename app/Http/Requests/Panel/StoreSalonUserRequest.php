@@ -35,7 +35,7 @@ class StoreSalonUserRequest extends FormRequest
             'is_active' => ['sometimes', 'boolean'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['string', Rule::in(['dashboard', 'service_categories', 'manage_service_categories', 'services', 'appointments', 'products', 'reports'])],
+            'permissions.*' => ['string', Rule::in(['dashboard', 'service_categories', 'manage_service_categories', 'services', 'manage_services', 'appointments', 'products', 'reports'])],
         ];
     }
 }

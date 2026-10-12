@@ -39,7 +39,7 @@ class ServiceCategoryController extends Controller
         }
 
         return ServiceCategoryResource::collection(
-            $query->paginate($filters['per_page'] ?? 12)->withQueryString(),
+            $query->paginate($filters['per_page'] ?? 5)->withQueryString(),
         );
     }
 

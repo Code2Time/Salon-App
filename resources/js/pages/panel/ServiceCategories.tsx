@@ -173,9 +173,9 @@ export default function ServiceCategories() {
         <section>
             <div className="page-heading users-heading">
                 <div>
-                    <span className="eyebrow">ساختار خدمات سالن</span>
-                    <Typography variant="h2" component="h1">دسته‌بندی خدمات</Typography>
-                    <Typography color="text.secondary">خدمات مرتبط را در گروه‌های واضح و قابل نمایش برای مشتریان مرتب کنید.</Typography>
+                    <span className="eyebrow">ساختار سرویس‌های سالن</span>
+                    <Typography variant="h2" component="h1">دسته‌بندی سرویس‌ها</Typography>
+                    <Typography color="text.secondary">سرویس‌های مرتبط را در گروه‌های واضح و قابل نمایش برای مشتریان مرتب کنید.</Typography>
                 </div>
                 {canManage && <Button variant="contained" onClick={openCreate}><Plus size={18} /> افزودن دسته‌بندی</Button>}
             </div>
@@ -216,7 +216,7 @@ export default function ServiceCategories() {
                                 </div>
                             </div>
                             <div className="category-card-body">
-                                <div><Typography variant="h3">{category.name}</Typography><span>{category.services_count} خدمت · ترتیب {category.sort_order}</span></div>
+                                <div><Typography variant="h3">{category.name}</Typography><span>{category.services_count} سرویس · ترتیب {category.sort_order}</span></div>
                                 <Typography color="text.secondary" variant="body2">{category.description || "توضیحی برای این دسته‌بندی ثبت نشده است."}</Typography>
                                 <div className="category-actions">
                                     <Button color="inherit" disabled={detailsLoading} onClick={() => void openDetails(category)}><Eye size={16} /> جزئیات</Button>
@@ -260,7 +260,7 @@ export default function ServiceCategories() {
                         {details?.is_featured && <Chip className="category-featured-chip" icon={<Sparkles size={14} />} label="ویژه" size="small" />}
                         <span>ترتیب نمایش: {details?.sort_order}</span>
                     </div>
-                    <Typography variant="h3" component="h3">خدمات مرتبط</Typography>
+                    <Typography variant="h3" component="h3">سرویس‌های مرتبط</Typography>
                     {details?.services?.length ? (
                         <div className="category-service-list">
                             {details.services.map((service) => (
@@ -270,7 +270,7 @@ export default function ServiceCategories() {
                                 </div>
                             ))}
                         </div>
-                    ) : <div className="category-services-empty"><Shapes size={28} /><span>هنوز خدمتی به این دسته‌بندی متصل نشده است.</span></div>}
+                    ) : <div className="category-services-empty"><Shapes size={28} /><span>هنوز سرویسی به این دسته‌بندی متصل نشده است.</span></div>}
                 </DialogContent>
                 <DialogActions><Button color="inherit" onClick={() => setDetails(null)}>بستن</Button></DialogActions>
             </Dialog>
@@ -279,9 +279,9 @@ export default function ServiceCategories() {
                 <DialogTitle>حذف دسته‌بندی «{deleteImpact?.category.name}»</DialogTitle>
                 <DialogContent className="category-delete-content">
                     {deleteImpact?.services.length ? <>
-                        <Alert severity="warning">ارتباط این دسته‌بندی با خدمات زیر حذف می‌شود. خدمات بدون دسته‌بندی دیگر نیز به‌صورت نرم حذف خواهند شد.</Alert>
-                        <ul>{deleteImpact.services.map((service) => <li key={service.id}><strong>{service.name}</strong><span>{service.will_be_deleted ? "حذف نرم خدمت" : "باقی‌ماندن در دسته‌های دیگر"}</span></li>)}</ul>
-                    </> : <Typography color="text.secondary">این دسته‌بندی خدمتی ندارد و با حذف آن، خدمت دیگری تغییر نمی‌کند.</Typography>}
+                        <Alert severity="warning">ارتباط این دسته‌بندی با سرویس‌های زیر حذف می‌شود. سرویس‌های بدون دسته‌بندی دیگر نیز به‌صورت نرم حذف خواهند شد.</Alert>
+                        <ul>{deleteImpact.services.map((service) => <li key={service.id}><strong>{service.name}</strong><span>{service.will_be_deleted ? "حذف نرم سرویس" : "باقی‌ماندن در دسته‌های دیگر"}</span></li>)}</ul>
+                    </> : <Typography color="text.secondary">این دسته‌بندی سرویسی ندارد و با حذف آن، سرویس دیگری تغییر نمی‌کند.</Typography>}
                 </DialogContent>
                 <DialogActions><Button color="inherit" disabled={deleteLoading} onClick={() => setDeleteImpact(null)}>انصراف</Button><Button color="error" variant="contained" disabled={deleteLoading} onClick={() => void confirmDelete()}>{deleteLoading ? "در حال حذف…" : "تأیید حذف"}</Button></DialogActions>
             </Dialog>

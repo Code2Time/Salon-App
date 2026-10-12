@@ -44,9 +44,10 @@ const roleLabels: Record<SalonRole, string> = {
 const assignableRoles: SalonRole[] = ["salon_owner", "employee", "customer"];
 const permissionOptions: Array<{ value: PanelPermission; label: string }> = [
     { value: "dashboard", label: "داشبورد" },
-    { value: "service_categories", label: "مشاهده دسته‌بندی خدمات" },
-    { value: "manage_service_categories", label: "مدیریت دسته‌بندی خدمات" },
-    { value: "services", label: "خدمات" },
+    { value: "service_categories", label: "مشاهده دسته‌بندی سرویس‌ها" },
+    { value: "manage_service_categories", label: "مدیریت دسته‌بندی سرویس‌ها" },
+    { value: "services", label: "مشاهده سرویس‌ها" },
+    { value: "manage_services", label: "مدیریت سرویس‌ها" },
     { value: "appointments", label: "نوبت‌ها" },
     { value: "products", label: "محصولات" },
     { value: "reports", label: "گزارش‌ها" },
@@ -307,6 +308,12 @@ export default function Users({
                                                     }
                                                     if (option.value === "service_categories" && !event.target.checked) {
                                                         permissions = permissions.filter((permission) => permission !== "manage_service_categories");
+                                                    }
+                                                    if (option.value === "manage_services" && event.target.checked) {
+                                                        permissions = [...permissions, "services"];
+                                                    }
+                                                    if (option.value === "services" && !event.target.checked) {
+                                                        permissions = permissions.filter((permission) => permission !== "manage_services");
                                                     }
                                                     setForm({ ...form, permissions: [...new Set(permissions)] });
                                                 }}

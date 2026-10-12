@@ -2,12 +2,17 @@
 
 use App\Http\Controllers\Api\Auth\OtpAuthController;
 use App\Http\Controllers\Api\Auth\SessionController;
+use App\Http\Controllers\Api\CustomerServiceController;
 use App\Http\Controllers\Api\Panel\ProfileController as PanelProfileController;
 use App\Http\Controllers\Api\Panel\SalonUserController;
 use App\Http\Controllers\Api\Panel\ServiceCategoryController;
+use App\Http\Controllers\Api\Panel\ServiceController;
 use App\Http\Controllers\Api\ProfileController as CustomerProfileController;
 use App\Services\CurrentSalon;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/catalog/services', [CustomerServiceController::class, 'index']);
+Route::get('/catalog/service-categories', [CustomerServiceController::class, 'categories']);
 
 Route::prefix('auth')->group(function () {
     Route::post('/otp/request', [OtpAuthController::class, 'request'])->middleware('throttle:5,1');
@@ -40,4 +45,13 @@ Route::middleware(['auth:sanctum', 'panel', 'salon'])->prefix('/panel/service-ca
     Route::post('/', [ServiceCategoryController::class, 'store'])->middleware('service-categories:manage');
     Route::post('/{service_category}', [ServiceCategoryController::class, 'update'])->middleware('service-categories:manage');
     Route::delete('/{service_category}', [ServiceCategoryController::class, 'destroy'])->middleware('service-categories:manage');
+});
+
+Route::middleware(['auth:sanctum', 'panel', 'salon'])->prefix('/panel/services')->group(function () {
+    Route::get('/', [ServiceController::class, 'index'])->middleware('services');
+    Route::get('/options', [ServiceController::class, 'options'])->middleware('services');
+    Route::get('/{service}', [ServiceController::class, 'show'])->middleware('services');
+    Route::post('/', [ServiceController::class, 'store'])->middleware('services:manage');
+    Route::put('/{service}', [ServiceController::class, 'update'])->middleware('services:manage');
+    Route::delete('/{service}', [ServiceController::class, 'destroy'])->middleware('services:manage');
 });

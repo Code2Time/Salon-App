@@ -32,17 +32,17 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($users as $data) {
-            $user = User::query()->updateOrCreate(
-                ['mobile' => $data['mobile']],
-                [
-                    'name' => $data['first_name'].' '.$data['last_name'],
-                    'first_name' => $data['first_name'],
-                    'last_name' => $data['last_name'],
-                    'mobile_verified_at' => now(),
-                    'system_role' => $data['system_role'] ?? null,
-                    'is_active' => true,
-                ],
-            );
+            $user = User::withTrashed()->firstOrNew(['mobile' => $data['mobile']]);
+            $user->fill([
+                'name' => $data['first_name'].' '.$data['last_name'],
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'mobile_verified_at' => now(),
+                'system_role' => $data['system_role'] ?? null,
+                'is_active' => true,
+            ]);
+            $user->deleted_at = null;
+            $user->save();
 
             if (isset($data['role'])) {
                 $salon->users()->syncWithoutDetaching([
@@ -50,5 +50,11 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         }
+
+        $this->call([
+            EmployeeSeeder::class,
+            ServiceCategorySeeder::class,
+            ServiceSeeder::class,
+        ]);
     }
 }

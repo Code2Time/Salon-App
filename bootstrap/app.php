@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsurePanelAccess;
 use App\Http\Middleware\EnsureSalonUsersManagement;
+use App\Http\Middleware\EnsureServiceAccess;
 use App\Http\Middleware\EnsureServiceCategoryAccess;
 use App\Http\Middleware\ResolveSalonContext;
 use App\Services\Errors\DatabaseExceptionReporter;
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'salon' => ResolveSalonContext::class,
             'manage-salon-users' => EnsureSalonUsersManagement::class,
             'service-categories' => EnsureServiceCategoryAccess::class,
+            'services' => EnsureServiceAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

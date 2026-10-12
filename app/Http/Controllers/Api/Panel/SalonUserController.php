@@ -43,7 +43,7 @@ class SalonUserController extends Controller
             $query->wherePivot('is_active', $status === 'active');
         }
 
-        return SalonUserResource::collection($query->paginate($filters['per_page'] ?? 10)->withQueryString());
+        return SalonUserResource::collection($query->paginate($filters['per_page'] ?? 5)->withQueryString());
     }
 
     public function store(StoreSalonUserRequest $request, CurrentSalon $context): JsonResponse
@@ -170,6 +170,10 @@ class SalonUserController extends Controller
         if (in_array('manage_service_categories', $permissions, true)
             && ! in_array('service_categories', $permissions, true)) {
             $permissions[] = 'service_categories';
+        }
+        if (in_array('manage_services', $permissions, true)
+            && ! in_array('services', $permissions, true)) {
+            $permissions[] = 'services';
         }
 
         return array_values(array_unique($permissions));

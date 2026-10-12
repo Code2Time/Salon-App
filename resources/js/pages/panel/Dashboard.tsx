@@ -16,7 +16,7 @@ const shortcuts = [
         icon: UsersRound,
     },
     {
-        title: "خدمات سالن",
+        title: "سرویس‌های سالن",
         description: "زیبایی، با امضای شما",
         path: "/panel/services",
         icon: Scissors,
@@ -50,7 +50,7 @@ export default function Dashboard() {
                         نظمش را به آرا بسپارید.
                     </Typography>
                     <Typography color="text.secondary">
-                        فضایی یکپارچه برای تیم، خدمات و قرارهای سالن شما.
+                        فضایی یکپارچه برای تیم، سرویس‌ها و قرارهای سالن شما.
                     </Typography>
                     <Button component={Link} to="/app" variant="contained">
                         دیدن فضای مشتری <ArrowLeft size={18} />

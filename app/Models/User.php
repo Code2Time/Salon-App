@@ -65,7 +65,7 @@ class User extends Authenticatable
     public function salons(): BelongsToMany
     {
         return $this->belongsToMany(Salon::class)
-            ->withPivot(['role', 'permissions', 'is_active'])
+            ->withPivot(['id', 'role', 'permissions', 'is_active'])
             ->withTimestamps()
             ->using(SalonUser::class);
     }
