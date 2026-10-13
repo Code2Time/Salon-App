@@ -26,6 +26,7 @@ export interface CustomerServiceFilters {
     category_id?: number;
     sort?: "newest" | "price_asc" | "price_desc";
     page?: number;
+    per_page?: number;
 }
 
 export interface CustomerServicePage {

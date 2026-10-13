@@ -950,21 +950,21 @@ main:focus {
 }
 .service-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
 }
 .service-card {
     display: flex;
     flex-direction: column;
     min-width: 0;
-    padding: 20px;
-    border-radius: 24px !important;
+    padding: 22px;
+    border-radius: 26px !important;
     overflow: hidden;
     background: linear-gradient(155deg, #fff 0%, #fffafb 100%) !important;
     transition: transform 180ms cubic-bezier(.2, .8, .2, 1), box-shadow 180ms ease, border-color 180ms ease;
     will-change: transform;
 }
-.service-card:hover { transform: translateY(-3px); border-color: #e8c5d1; box-shadow: 0 18px 44px rgba(91, 38, 61, .09); }
+.service-card:hover { transform: translateY(-4px); border-color: #dfadbf; box-shadow: 0 22px 52px rgba(91, 38, 61, .12); }
 
 @media (prefers-reduced-motion: reduce) {
     .user-row,
@@ -978,7 +978,13 @@ main:focus {
         transform: none;
     }
 }
-.service-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+
+.service-card-cover { position: relative; height: 230px; overflow: hidden; margin: -22px -22px 20px; background: linear-gradient(135deg, #f7dce7, #fff0dc); }
+.service-card-cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(39,17,26,.02) 30%, rgba(42,17,28,.62)); pointer-events: none; }
+.service-card-cover img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.service-card-cover.is-default img { width: 138px; height: 138px; margin: 46px auto; object-fit: contain; filter: drop-shadow(0 12px 24px rgba(111,35,65,.18)); }
+.service-card-cover-badges { position: absolute; z-index: 1; inset-inline: 16px; bottom: 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.service-card-cover-badges > span { padding: 7px 11px; color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 999px; background: rgba(52,24,36,.55); backdrop-filter: blur(8px); font-size: 10px; font-weight: 700; }
 .service-icon, .service-form-intro > span {
     display: grid;
     width: 44px;
@@ -988,16 +994,16 @@ main:focus {
     border-radius: 15px;
     background: linear-gradient(145deg, #fce8ef, #fff5f8);
 }
-.service-card-title { min-height: 84px; }
-.service-card-title h3 { margin-bottom: 5px; font-size: 1.08rem; }
+.service-card-title { min-height: 86px; }
+.service-card-title h3 { margin-bottom: 6px; color: #452331; font-size: 1.16rem; }
 .service-card-title p { display: -webkit-box; overflow: hidden; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.8; }
 .service-metrics {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 9px;
-    margin: 16px 0;
+    margin: 18px 0;
 }
-.service-metrics > div { display: grid; grid-template-columns: auto 1fr; gap: 2px 7px; padding: 12px; color: #74304d; border-radius: 16px; background: #fff3f7; }
+.service-metrics > div { display: grid; grid-template-columns: auto 1fr; gap: 2px 9px; padding: 14px; color: #74304d; border: 1px solid #f0dce4; border-radius: 17px; background: #fff7fa; }
 .service-metrics svg { grid-row: span 2; align-self: center; }
 .service-metrics span { color: #8d7080; font-size: .72rem; }
 .service-metrics strong { color: #432735; font-size: .82rem; white-space: nowrap; }
@@ -1029,6 +1035,8 @@ main:focus {
     .service-toolbar, .service-grid, .service-form.MuiDialogContent-root, .service-form-row { grid-template-columns: 1fr; }
     .service-toolbar .users-search { grid-column: auto; }
     .service-card { padding: 16px; border-radius: 20px !important; }
+    .service-card-cover { height: 190px; margin: -16px -16px 16px; }
+    .service-card-cover.is-default img { width: 112px; height: 112px; margin: 39px auto; }
     .service-card-title { min-height: auto; }
     .service-form-intro, .service-description, .service-form > .MuiAutocomplete-root, .service-form > .category-switch, .service-form-row { grid-column: auto; }
     .service-form.MuiDialogContent-root { gap: 15px; }
@@ -1566,6 +1574,103 @@ main:focus {
     .customer-service-card { transition: none; }
     .customer-category-strip button:hover,
     .customer-service-card:hover { transform: none; }
+}
+.customer-services-page {
+    max-width: 1040px;
+    margin-inline: auto;
+    gap: 28px;
+}
+.customer-services-heading {
+    position: relative;
+    align-items: center;
+    overflow: hidden;
+    padding: 34px 36px;
+    border: 1px solid #eed5de;
+    border-radius: 30px;
+    background: linear-gradient(125deg, #fff 0%, #fff2f6 58%, #f9e9d5 100%);
+    box-shadow: 0 20px 55px rgba(100, 29, 57, .08);
+}
+.customer-services-heading::after {
+    content: "✦";
+    position: absolute;
+    inset-inline-end: 34px;
+    top: -28px;
+    color: rgba(161, 49, 92, .09);
+    font-size: 118px;
+    line-height: 1;
+}
+.customer-services-heading > div { position: relative; z-index: 1; max-width: 630px; }
+.customer-services-heading h1 { font-size: clamp(25px, 3vw, 35px); }
+.customer-services-count { position: relative; z-index: 1; color: #6d2945; border-color: #e4b9c9; background: rgba(255,255,255,.68); }
+.customer-service-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.customer-service-card { min-height: 360px; padding: 0; border-color: #ebdbe1 !important; background: #fff !important; }
+.customer-service-visual { position: relative; min-height: 145px; display: flex; align-items: flex-end; justify-content: space-between; overflow: hidden; padding: 18px 20px; color: #7f2b4d; background: linear-gradient(135deg, #f9dce7, #fff0d9); background-position: center; background-size: cover; }
+.customer-service-visual.has-image::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(39, 17, 27, .03), rgba(44, 18, 29, .68)); }
+.customer-service-visual span { position: relative; z-index: 1; padding: 6px 10px; color: #71304a; border-radius: 999px; background: rgba(255,255,255,.86); backdrop-filter: blur(7px); font-size: 9px; font-weight: 700; }
+.customer-service-visual.has-image span { color: #fff; background: rgba(59, 27, 40, .55); }
+.customer-service-copy { position: relative; z-index: 1; min-height: 0; padding: 20px 22px 0; }
+.customer-service-title { display: flex; align-items: flex-start; justify-content: space-between; min-height: 64px; margin-bottom: 12px; color: #a33c65; }
+.customer-service-title > div { display: grid; gap: 5px; }
+.customer-service-title span { color: #a57d8d; font-size: 9px; font-weight: 700; }
+.customer-service-title h2 { color: #4d2033; font-size: 16px; line-height: 1.7; }
+.customer-service-copy > p { min-height: 54px; -webkit-line-clamp: 2; }
+.customer-service-footer { display: flex; align-items: end; justify-content: space-between; gap: 10px; margin: auto 22px 0; padding: 18px 0 20px; border-top: 1px solid #f1e5ea; }
+.customer-service-footer > div { display: grid; gap: 3px; }
+.customer-service-footer small { color: #a08390; font-size: 8px; }
+.customer-service-footer strong { color: #7c294a; font-size: 14px; }
+.customer-service-footer strong span { font-size: 8px; font-weight: 500; }
+.customer-service-footer .MuiButton-root { flex-shrink: 0; padding-inline: 8px; font-size: 9px; }
+.customer-service-dialog.MuiPaper-root { overflow: hidden; border-radius: 28px; background: linear-gradient(155deg, #fff, #fff9fb); }
+.customer-service-dialog-hero { position: relative; min-height: 210px; display: flex; align-items: flex-end; overflow: hidden; padding: 28px; color: #5f263e; background: linear-gradient(135deg, #f5cadb, #fae5cb); background-position: center; background-size: cover; }
+.customer-service-dialog-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(45,18,29,.04), rgba(46,19,30,.24)); }
+.customer-service-dialog-hero.has-image::after { background: linear-gradient(180deg, rgba(24,12,17,.06), rgba(35,15,24,.84)); }
+.customer-service-dialog-hero > .MuiIconButton-root { position: absolute; z-index: 2; top: 16px; inset-inline-end: 16px; color: #632640; background: rgba(255,255,255,.88); backdrop-filter: blur(8px); }
+.customer-service-dialog-heading { position: relative; z-index: 1; display: grid; gap: 7px; }
+.customer-service-dialog-heading > span { width: fit-content; padding: 5px 9px; color: #73304a; border-radius: 999px; background: rgba(255,255,255,.78); font-size: 8px; font-weight: 700; }
+.customer-service-dialog-heading h2 { color: #4c2033; font-size: 26px; text-shadow: 0 1px 0 rgba(255,255,255,.25); }
+.customer-service-dialog-hero.has-image .customer-service-dialog-heading h2 { color: #fff; text-shadow: 0 2px 18px rgba(0,0,0,.3); }
+.customer-service-dialog-heading > div { display: flex; flex-wrap: wrap; gap: 5px; }
+.customer-service-dialog-heading .MuiChip-root { height: 24px; color: #62223c; background: rgba(255,255,255,.86); backdrop-filter: blur(7px); font-size: 8px; }
+.customer-service-dialog .MuiDialogContent-root { display: grid; gap: 22px; padding: 26px 28px 22px !important; }
+.customer-service-dialog-about { display: grid; gap: 8px; }
+.customer-service-detail-label { color: #71304a; font-size: 10px; font-weight: 800; }
+.customer-service-dialog-description { margin: 0 !important; line-height: 2.1 !important; }
+.customer-service-dialog-facts { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+.customer-service-dialog-facts > div { display: flex; align-items: center; gap: 11px; padding: 12px; color: #963b60; border: 1px solid #efdce4; border-radius: 18px; background: #fffafb; }
+.customer-service-dialog-facts > div > span:last-child { display: grid; gap: 3px; }
+.customer-service-fact-icon { width: 42px; height: 42px; display: grid; flex: 0 0 auto; place-items: center; border-radius: 14px; background: #fbe7ee; }
+.customer-service-dialog-facts small { color: #9b7b89; font-size: 8px; }
+.customer-service-dialog-facts strong { color: #4b2737; font-size: 12px; }
+.customer-service-dialog-providers { display: grid; gap: 14px; padding: 18px; border: 1px solid #efdee5; border-radius: 20px; background: #fff; }
+.customer-service-dialog-section-title { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 10px; color: #8c3659; }
+.customer-service-dialog-section-title > span { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 13px; background: #f9e8ef; }
+.customer-service-dialog-section-title > div { display: grid; gap: 3px; }
+.customer-service-dialog-section-title strong { color: #4e2939; font-size: 12px; }
+.customer-service-dialog-section-title small { color: #9a7b89; font-size: 8px; }
+.customer-service-dialog-section-title > .MuiChip-root { height: 24px; color: #855c28; background: #fff2d9; font-size: 7px; }
+.customer-service-provider-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.customer-service-provider-grid > div { display: flex; align-items: center; gap: 9px; padding: 8px; border: 1px solid #eedee4; border-radius: 15px; background: #fff; font-size: 10px; }
+.customer-service-provider-grid .MuiAvatar-root { width: 36px; height: 36px; }
+.customer-service-dialog .MuiDialogActions-root { justify-content: space-between; gap: 14px; padding: 14px 28px 22px; border-top: 1px solid #f1e3e8; }
+.customer-service-dialog .MuiDialogActions-root p { color: #9b7f8b; font-size: 8px; }
+.customer-service-dialog .MuiDialogActions-root .MuiButton-root { min-width: 105px; }
+
+@media (max-width: 900px) {
+    .customer-service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+    .customer-services-heading { align-items: flex-start; padding: 25px 22px; border-radius: 24px; }
+    .customer-services-heading::after { inset-inline-end: -4px; }
+    .customer-service-grid { grid-template-columns: 1fr; }
+    .customer-service-card { min-height: 340px; }
+    .customer-service-dialog .MuiDialogContent-root { padding: 20px !important; }
+    .customer-service-dialog-facts, .customer-service-provider-grid { grid-template-columns: 1fr; }
+    .customer-service-dialog-hero { min-height: 185px; padding: 22px; }
+    .customer-service-dialog-heading h2 { font-size: 22px; }
+    .customer-service-dialog-section-title { grid-template-columns: auto minmax(0,1fr); }
+    .customer-service-dialog-section-title > .MuiChip-root { grid-column: 1 / -1; width: fit-content; margin-inline-start: 48px; }
+    .customer-service-dialog .MuiDialogActions-root { align-items: stretch; flex-direction: column; padding: 14px 20px 20px; }
+    .customer-service-dialog .MuiDialogActions-root p { text-align: center; }
 }
 .customer-profile-heading {
     margin-bottom: 24px;

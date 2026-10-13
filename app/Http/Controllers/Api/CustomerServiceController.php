@@ -22,7 +22,7 @@ class CustomerServiceController extends Controller
             'search' => ['nullable', 'string', 'max:100'],
             'category_id' => ['nullable', 'integer'],
             'sort' => ['nullable', Rule::in(['newest', 'price_asc', 'price_desc'])],
-            'per_page' => ['nullable', 'integer', 'min:5', 'max:20'],
+            'per_page' => ['nullable', 'integer', 'min:5', 'max:100'],
         ]);
         $salon = $this->salon($filters['salon'] ?? null);
         $query = $salon->services()

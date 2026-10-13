@@ -29,7 +29,7 @@ class ServiceController extends Controller
             'per_page' => ['nullable', 'integer', 'min:5', 'max:50'],
         ]);
         $query = $salon->services()
-            ->with(['categories:id,name,is_active', 'providers.user:id,name,first_name,last_name,image'])
+            ->with(['categories:id,name,is_active,image', 'providers.user:id,name,first_name,last_name,image'])
             ->withCount(['categories', 'providers'])
             ->latest();
 
@@ -142,7 +142,7 @@ class ServiceController extends Controller
     private function loaded(Service $service): Service
     {
         return $service->load([
-            'categories:id,name,is_active',
+            'categories:id,name,is_active,image',
             'providers.user:id,name,first_name,last_name,image',
         ])->loadCount(['categories', 'providers']);
     }

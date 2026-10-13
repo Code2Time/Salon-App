@@ -2,6 +2,7 @@ export interface ServiceCategoryOption {
     id: number;
     name: string;
     is_active: boolean;
+    image_url?: string | null;
 }
 
 export interface ServiceProvider {

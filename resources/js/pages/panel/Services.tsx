@@ -25,7 +25,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../../auth/AuthContext";
-import { defaultAvatarUrl } from "../../constants/assets";
+import { defaultAvatarUrl, logoUrl } from "../../constants/assets";
 import { readableApiError } from "../../services/api/client";
 import { createService, deleteService, fetchServiceOptions, fetchServices, updateService } from "../../services/api/services";
 import type { SalonService, ServiceInput, ServiceOptions } from "../../types/service";
@@ -191,9 +191,12 @@ export default function Services() {
                 <div className="service-grid">
                     {services.map((service) => (
                         <Paper variant="outlined" className="service-card" key={service.id}>
-                            <div className="service-card-top">
-                                <span className="service-icon"><Sparkles size={22} /></span>
-                                <Chip className={service.is_active ? "category-active-chip" : "category-inactive-chip"} label={service.is_active ? "فعال" : "غیرفعال"} size="small" />
+                            <div className={`service-card-cover${service.categories[0]?.image_url ? "" : " is-default"}`}>
+                                <img src={service.categories[0]?.image_url || logoUrl} alt={service.categories[0]?.image_url ? `تصویر دسته‌بندی ${service.categories[0].name}` : "تصویر پیش‌فرض سرویس"} />
+                                <div className="service-card-cover-badges">
+                                    <Chip className={service.is_active ? "category-active-chip" : "category-inactive-chip"} label={service.is_active ? "فعال" : "غیرفعال"} size="small" />
+                                    {service.categories[0] && <span>{service.categories[0].name}</span>}
+                                </div>
                             </div>
                             <div className="service-card-title"><Typography variant="h3">{service.name}</Typography><Typography variant="body2" color="text.secondary">{service.description || "توضیحی برای این سرویس ثبت نشده است."}</Typography></div>
                             <div className="service-metrics">

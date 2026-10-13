@@ -82,10 +82,10 @@ export default function Home() {
                     </span>
                     <div>
                         <Typography variant="h3" component="h3">
-                            سرویس‌های سالن
+                            خدمات سالن
                         </Typography>
                         <Typography color="text.secondary" variant="body2">
-                            سرویس مناسب خودتان را پیدا کنید
+                            خدمت مناسب خودتان را پیدا کنید
                         </Typography>
                     </div>
                     <ArrowLeft size={20} />

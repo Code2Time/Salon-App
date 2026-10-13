@@ -121,7 +121,7 @@ export const customerNavigation: NavigationItem[] = [
     },
     {
         path: "/app/services",
-        label: "سرویس‌ها",
+        label: "خدمات",
         description: "زمانی برای رسیدگی به خودتان",
         icon: Grid2X2,
     },

@@ -22,6 +22,7 @@ class ServiceResource extends JsonResource
                 'id' => $category->id,
                 'name' => $category->name,
                 'is_active' => $category->is_active,
+                'image_url' => $this->imageUrl($category->image),
             ])->values()),
             'providers' => $this->whenLoaded('providers', fn () => $this->providers->map(function ($membership) {
                 $image = $membership->user?->image;
@@ -39,5 +40,14 @@ class ServiceResource extends JsonResource
             'providers_count' => $this->whenCounted('providers'),
             'created_at' => $this->created_at?->toISOString(),
         ];
+    }
+
+    private function imageUrl(?string $image): ?string
+    {
+        if (! $image) {
+            return null;
+        }
+
+        return Str::startsWith($image, ['http://', 'https://', '/']) ? $image : Storage::url($image);
     }
 }
