@@ -20,8 +20,11 @@
 | 01 | [Panel & Customer Layouts](tasks/01-foundation.md) | done | پیاده‌سازی، Build، Type-check و بررسی مرورگر موفق |
 | 01b | [API & Auth](tasks/01b-api-auth.md) | done | OTP توسعه‌ای، Session/Sanctum، نقش‌ها، سالن و کنترل Layout/API |
 | 01c | [Database Error Logging](tasks/01c-error-logging.md) | done | ثبت مرکزی و امن خطاهای ۵۰۰ به بالا در دیتابیس |
-| 02 | [Salon Management](tasks/02-salon-management.md) | in_progress | کاربران، دسته‌بندی و خدمات تکمیل شدند؛ ساعات کاری و تنظیمات سالن باقی است |
+| 02 | [Salon Management](tasks/02-salon-management.md) | in_progress | کاربران، دسته‌بندی، خدمات و تقویم کاری سالن تکمیل شدند؛ داشبورد/تنظیمات عمومی باقی است |
 | 03 | [Appointments](tasks/03-appointments.md) | not_started | وابسته به 02 |
+| 03a | [Appointment Settings](tasks/03a-appointment-settings.md) | done | منوی بازشونده، تنظیم دوره و تقویم کاری سالن تکمیل شد |
+| 03b | [Employee Availability](tasks/03b-employee-availability.md) | done | حضور کارکنان، ویرایش مدیر و اعلان داخل برنامه تکمیل شد |
+| 03c | [Booking Availability](tasks/03c-booking-availability.md) | not_started | وابسته به 03a و 03b؛ موتور زمان آزاد و رزرو |
 | 04 | [Payments](tasks/04-payments.md) | not_started | وابسته به 03 و تصمیم درگاه |
 | 05 | [Customer App](tasks/05-customer-app.md) | in_progress | پروفایل و کاتالوگ عمومی سرویس‌ها تکمیل شدند؛ رزرو، نوبت‌ها و اعلان‌ها باقی است |
 | 06 | [Advanced Features](tasks/06-advanced-features.md) | needs_scoping | انتخاب زیرکار پیش از اجرا ضروری است |
@@ -29,6 +32,10 @@
 وضعیت‌های مجاز: `not_started`، `in_progress`، `blocked`، `done`، `needs_scoping`.
 
 ## آخرین تحویل
+
+- تاریخ: 2026-10-14؛ زیرتسک `03b-employee-availability` تکمیل شد. کارکنان در `/panel/my-schedule` برنامه خود را فقط در روزها و ساعات باز سالن با چند بازه غیرمتداخل ثبت می‌کنند. مدیر در `/panel/employee-schedules` کارمند را انتخاب، برنامه را مشاهده و ویرایش می‌کند؛ هر تغییر مدیر اعلان دیتابیسی در Bell پنل همان کارمند ایجاد می‌کند. روزهای بدون تنظیم صریح سالن باز با بازه پایه ۰۹ تا ۱۷ و روزهای ثبت‌شده مطابق تقویم سالن تفسیر می‌شوند. دو جدول حضور و بازه‌ها و جدول استاندارد اعلان‌ها ساخته و Migration روی MySQL اجرا شد. PHPUnit با ۵۰ تست و ۲۷۸ assertion، تست اختصاصی با ۳ تست و ۱۸ assertion، Pint، Type-check، Build و `git diff --check` موفق‌اند. `03c` هنوز شروع نشده است.
+
+- تاریخ: 2026-10-14؛ زیرتسک `03a-appointment-settings` تکمیل شد. منوی پنل از گروه بازشونده نوبت‌دهی پشتیبانی می‌کند و صفحه مدیرمحور `/panel/appointment-settings` برای انتخاب برنامه هفتگی/ماهانه، گزینه تکرار و تعریف روزهای باز، بسته و خاص با چند بازه کاری ساخته شد. تقویم UI جلالی است و تاریخ API/Database میلادی باقی می‌ماند؛ نمای ماهانه برای خوانایی در گروه‌های هفت‌روزه نمایش داده می‌شود. سه جدول `appointment_settings`، `salon_working_days` و `salon_working_periods` و سه Route سالن‌محور اضافه شدند. کارکنان به تنظیمات دسترسی ندارند، بازه‌های نامعتبر/متداخل رد می‌شوند و داده سالن‌ها جداست. Migration روی دیتابیس توسعه اجرا شد. PHPUnit با ۴۷ تست و ۲۶۰ assertion، تست اختصاصی با ۴ تست و ۳۲ assertion، Pint، Type-check و Build موفق‌اند؛ Build فقط هشدار غیرمسدودکننده chunk بزرگ دارد. مرحله بعد تنها با درخواست کاربر `03b` است.
 
 - تاریخ: 2026-10-13؛ UI کارت‌های `/panel/services` بازطراحی شد. فهرست دسکتاپ دو ستونه، موبایل تک‌ستونه و تصویر دسته‌بندی اصلی به‌صورت کاور بزرگ نمایش داده می‌شود؛ نام دسته و وضعیت روی تصویر قرار دارند و لوگوی پروژه برای موارد بدون تصویر استفاده می‌شود. `ServiceResource` و eager loading پنل نیز برای تحویل `image_url` دسته‌بندی هماهنگ شدند. PHPUnit با ۴۳ تست و ۲۲۸ assertion، Pint روی ۹۵ فایل، Type-check، Build و `git diff --check` موفق‌اند.
 

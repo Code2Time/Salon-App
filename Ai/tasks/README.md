@@ -12,6 +12,9 @@
 | 02b | [02b-service-categories.md](02b-service-categories.md) | CRUD دسته‌بندی خدمات و رابطه چندبه‌چند خدمات | 02a |
 | 02c | [02c-service-management.md](02c-service-management.md) | CRUD خدمات، دسته‌بندی‌ها و کارکنان ارائه‌دهنده | 02b |
 | 03 | [03-appointments.md](03-appointments.md) | رزرو، زمان آزاد و تقویم | 02 |
+| 03a | [03a-appointment-settings.md](03a-appointment-settings.md) | منوی بازشونده و تقویم کاری سالن | بخش‌های کاربران و خدمات 02 |
+| 03b | [03b-employee-availability.md](03b-employee-availability.md) | برنامه حضور کارکنان و نظارت مدیر | 03a |
+| 03c | [03c-booking-availability.md](03c-booking-availability.md) | موتور زمان آزاد و رزرو امن | 03a و 03b |
 | 04 | [04-payments.md](04-payments.md) | پیش‌پرداخت و سوابق پرداخت | 03 |
 | 05 | [05-customer-app.md](05-customer-app.md) | تجربهٔ مشتری | 03 و بخش لازم 04 |
 | 06 | [06-advanced-features.md](06-advanced-features.md) | قابلیت‌های توسعه‌ای انتخاب‌شده | پیش‌نیاز زیرکار منتخب |

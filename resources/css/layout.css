@@ -1178,6 +1178,46 @@ main:focus {
 .panel-navigation .nav-item.active svg {
     color: #f3a9c6;
 }
+.nav-group-trigger {
+    width: 100%;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    background: transparent;
+}
+.nav-group-trigger .nav-group-chevron {
+    margin-inline-start: auto;
+    transition: transform 0.2s ease;
+}
+.nav-group-trigger[aria-expanded="true"] .nav-group-chevron {
+    transform: rotate(180deg);
+}
+.nav-group.active > .nav-group-trigger {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.055);
+}
+.nav-children {
+    display: grid;
+    gap: 3px;
+    margin: 4px 18px 6px 0;
+    padding-right: 13px;
+    border-right: 1px solid rgba(242, 169, 198, 0.22);
+}
+.nav-children[hidden] { display: none; }
+.nav-child {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    border-radius: 9px;
+    color: #bea1ad;
+    font-size: 11px;
+}
+.nav-child:hover,
+.nav-child.active {
+    color: #fff;
+    background: rgba(226, 102, 152, 0.16);
+}
 .sidebar-bottom {
     padding-top: 22px;
 }
@@ -1313,6 +1353,8 @@ main:focus {
 .admin-shell.sidebar-collapsed .sidebar-workspace > span:last-child,
 .admin-shell.sidebar-collapsed .nav-caption,
 .admin-shell.sidebar-collapsed .panel-navigation .nav-item span,
+.admin-shell.sidebar-collapsed .nav-group-chevron,
+.admin-shell.sidebar-collapsed .nav-children,
 .admin-shell.sidebar-collapsed .sidebar-note,
 .admin-shell.sidebar-collapsed .sidebar-logout span {
     display: none;
@@ -1333,6 +1375,173 @@ main:focus {
 .admin-shell.sidebar-collapsed .sidebar-logout.MuiButton-root {
     justify-content: center;
 }
+.appointment-settings-page {
+    display: grid;
+    gap: 22px;
+}
+.appointment-heading,
+.schedule-preferences,
+.schedule-toolbar,
+.schedule-day-top,
+.working-period-heading,
+.working-period-row {
+    display: flex;
+    align-items: center;
+}
+.appointment-heading,
+.schedule-toolbar,
+.working-period-heading { justify-content: space-between; }
+.schedule-preferences {
+    gap: 24px;
+    padding: 20px 22px;
+    border-radius: 18px;
+    flex-wrap: wrap;
+}
+.schedule-preferences > div:first-child { margin-inline-end: auto; }
+.schedule-preferences h3 { margin-bottom: 4px; }
+.schedule-calendar {
+    padding: 20px;
+    border-radius: 22px;
+    overflow: hidden;
+}
+.schedule-toolbar {
+    gap: 18px;
+    margin-bottom: 20px;
+}
+.schedule-title {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 3px 9px;
+    text-align: center;
+}
+.schedule-title small { grid-column: 2; color: var(--ara-muted); }
+.schedule-jump { display: flex; align-items: center; gap: 8px; width: min(330px, 38%); }
+.schedule-jump .MuiFormControl-root { flex: 1; }
+.schedule-day-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+.schedule-day-card {
+    min-width: 0;
+    min-height: 210px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    text-align: right;
+    font: inherit;
+    color: var(--ara-text);
+    border: 1px solid rgba(112, 47, 72, 0.12);
+    border-radius: 18px;
+    background: #fff;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.schedule-day-card:hover { transform: translateY(-3px); border-color: rgba(208, 59, 119, .35); box-shadow: 0 16px 32px rgba(83, 34, 54, .1); }
+.schedule-day-card.open { border-color: rgba(208, 59, 119, .28); }
+.schedule-day-top {
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 66px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #fff7fa, #f9edf2);
+    border-bottom: 1px solid rgba(112, 47, 72, .08);
+}
+.schedule-day-card.open .schedule-day-top { background: linear-gradient(135deg, #fce5ee, #fff5f8); }
+.schedule-date { display: grid; gap: 2px; min-width: 0; }
+.schedule-date small { color: #9a7886; font-size: 10px; }
+.schedule-date strong { font-size: 14px; color: #55313f; }
+.day-open-chip.MuiChip-root { color: #176b4b; background: #e5f7ef; font-weight: 700; }
+.day-closed-chip.MuiChip-root { color: #806974; background: #eee8eb; font-weight: 700; }
+.schedule-day-body { display: grid; align-content: start; gap: 10px; padding: 14px; flex: 1; min-width: 0; }
+.schedule-day-title { font-weight: 700; font-size: 12px; overflow-wrap: anywhere; }
+.schedule-periods { display: flex; flex-wrap: wrap; gap: 6px; color: var(--ara-primary-deep); font-size: 10px; line-height: 1.7; }
+.schedule-periods > span { display: inline-flex; align-items: center; gap: 4px; padding: 4px 7px; border-radius: 8px; background: #fff4f7; }
+.schedule-day-body > small { color: var(--ara-muted); line-height: 1.7; overflow-wrap: anywhere; }
+.schedule-card-action { display: flex; align-items: center; gap: 5px; padding: 10px 14px; color: #9a6379; font-size: 10px; border-top: 1px solid #f2e7eb; }
+.schedule-loading { min-height: 240px; display: grid; place-items: center; }
+.working-day-dialog.MuiPaper-root { width: min(620px, calc(100vw - 24px)); max-width: 620px; overflow-x: hidden; border-radius: 22px; }
+.working-day-dialog .MuiDialogTitle-root { padding: 22px 24px 14px; }
+.working-day-form.MuiDialogContent-root { display: grid; gap: 18px; padding: 10px 24px 20px !important; overflow-x: hidden; }
+.working-period-list { min-width: 0; display: grid; gap: 14px; padding: 16px; border: 1px solid var(--ara-border); border-radius: 16px; background: #fffafb; overflow: hidden; }
+.working-period-row { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 40px; gap: 10px; }
+.working-period-row > .MuiFormControl-root { min-width: 0; width: 100%; }
+.working-period-row .MuiInputBase-root,
+.working-period-row .MuiInputBase-input { min-width: 0; }
+.working-day-dialog .MuiDialogActions-root { padding: 14px 24px 20px; border-top: 1px solid #f2e7eb; }
+.ara-time-picker,
+.ara-date-picker { border-radius: 18px !important; overflow: hidden; box-shadow: 0 22px 60px rgba(65, 25, 42, .2) !important; }
+.ara-time-picker.MuiPaper-root {
+    min-width: min(380px, calc(100vw - 24px));
+}
+.ara-time-picker .MuiMultiSectionDigitalClock-root {
+    min-height: 340px;
+}
+.ara-time-picker .MuiMultiSectionDigitalClockSection-root {
+    width: 50%;
+    max-height: 340px;
+    padding-block: 10px;
+}
+.ara-time-picker .MuiMultiSectionDigitalClockSection-item {
+    min-height: 48px;
+    margin-inline: 7px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+.ara-time-picker .MuiDigitalClock-root {
+    width: 340px;
+    max-height: 380px;
+    padding-block: 10px;
+}
+.ara-time-picker .MuiDigitalClock-item {
+    min-height: 48px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+.employee-schedule-page { display: grid; gap: 20px; }
+.employee-schedule-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px; border-radius: 18px; }
+.employee-schedule-toolbar .MuiFormControl-root { min-width: 220px; }
+.employee-week-navigation { display: flex; align-items: center; gap: 10px; }
+.employee-day-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.employee-day-card { min-width: 0; min-height: 160px; display: flex; flex-direction: column; gap: 12px; padding: 16px; text-align: right; font: inherit; color: var(--ara-text); background: #fff; border: 1px solid var(--ara-border); border-radius: 17px; cursor: pointer; }
+.employee-day-card > span { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.employee-day-card > small { color: var(--ara-muted); line-height: 1.7; }
+.employee-day-card > div { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.employee-day-card b { display: inline-flex; align-items: center; gap: 4px; padding: 6px 8px; color: var(--ara-primary-deep); background: #fff1f6; border-radius: 8px; font-size: 10px; }
+.employee-day-card.present { border-color: rgba(208, 59, 119, .35); box-shadow: inset 0 3px 0 #d64f86; }
+.employee-day-card:disabled { cursor: not-allowed; opacity: .62; background: #f4f0f2; }
+
+@media (max-width: 1100px) {
+    .schedule-day-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .schedule-toolbar { flex-wrap: wrap; }
+    .schedule-jump { width: 100%; order: 3; }
+    .employee-day-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+    .appointment-heading { align-items: flex-start; gap: 14px; }
+    .schedule-preferences { align-items: flex-start; flex-direction: column; }
+    .schedule-day-grid { grid-template-columns: 1fr; }
+    .schedule-day-card { min-height: 190px; }
+    .schedule-toolbar { justify-content: center; }
+    .schedule-title { order: -1; width: 100%; justify-content: center; }
+    .schedule-jump { align-items: stretch; flex-direction: column; }
+    .working-day-dialog .MuiDialogTitle-root { padding: 18px 16px 12px; }
+    .working-day-form.MuiDialogContent-root { padding: 8px 16px 18px !important; }
+    .working-period-list { padding: 12px; }
+    .working-period-row { grid-template-columns: minmax(0, 1fr) 38px; }
+    .working-period-row > .MuiFormControl-root:nth-child(2) { grid-column: 1; }
+    .working-period-row > .MuiIconButton-root { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+    .working-day-dialog .MuiDialogActions-root { padding: 12px 16px 16px; }
+    .employee-schedule-toolbar { align-items: stretch; flex-direction: column; }
+    .employee-schedule-toolbar .MuiFormControl-root { min-width: 0; }
+    .employee-week-navigation { justify-content: space-between; }
+    .employee-week-navigation strong { font-size: 10px; text-align: center; }
+    .employee-day-grid { grid-template-columns: 1fr; }
+}
+
 .customer-shell {
     min-height: 100dvh;
 }

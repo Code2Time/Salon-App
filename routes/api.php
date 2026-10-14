@@ -3,6 +3,9 @@
 use App\Http\Controllers\Api\Auth\OtpAuthController;
 use App\Http\Controllers\Api\Auth\SessionController;
 use App\Http\Controllers\Api\CustomerServiceController;
+use App\Http\Controllers\Api\Panel\AppointmentScheduleController;
+use App\Http\Controllers\Api\Panel\EmployeeScheduleController;
+use App\Http\Controllers\Api\Panel\NotificationController;
 use App\Http\Controllers\Api\Panel\ProfileController as PanelProfileController;
 use App\Http\Controllers\Api\Panel\SalonUserController;
 use App\Http\Controllers\Api\Panel\ServiceCategoryController;
@@ -54,4 +57,21 @@ Route::middleware(['auth:sanctum', 'panel', 'salon'])->prefix('/panel/services')
     Route::post('/', [ServiceController::class, 'store'])->middleware('services:manage');
     Route::put('/{service}', [ServiceController::class, 'update'])->middleware('services:manage');
     Route::delete('/{service}', [ServiceController::class, 'destroy'])->middleware('services:manage');
+});
+
+Route::middleware(['auth:sanctum', 'panel', 'salon', 'appointment-settings'])
+    ->prefix('/panel/appointment-schedule')->group(function () {
+        Route::get('/', [AppointmentScheduleController::class, 'show']);
+        Route::put('/settings', [AppointmentScheduleController::class, 'updateSettings']);
+        Route::put('/days/{date}', [AppointmentScheduleController::class, 'updateDay']);
+    });
+
+Route::middleware(['auth:sanctum', 'panel', 'salon'])->prefix('/panel/employee-schedule')->group(function () {
+    Route::get('/', [EmployeeScheduleController::class, 'show']);
+    Route::get('/employees', [EmployeeScheduleController::class, 'employees']);
+    Route::put('/days/{date}', [EmployeeScheduleController::class, 'update']);
+});
+Route::middleware(['auth:sanctum', 'panel'])->prefix('/panel/notifications')->group(function () {
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::post('/{notification}/read', [NotificationController::class, 'read']);
 });

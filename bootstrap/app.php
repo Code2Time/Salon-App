@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureAppointmentSettingsAccess;
 use App\Http\Middleware\EnsurePanelAccess;
 use App\Http\Middleware\EnsureSalonUsersManagement;
 use App\Http\Middleware\EnsureServiceAccess;
@@ -26,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'manage-salon-users' => EnsureSalonUsersManagement::class,
             'service-categories' => EnsureServiceCategoryAccess::class,
             'services' => EnsureServiceAccess::class,
+            'appointment-settings' => EnsureAppointmentSettingsAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

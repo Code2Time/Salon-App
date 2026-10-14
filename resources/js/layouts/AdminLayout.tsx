@@ -21,13 +21,15 @@ import {
 import { Link, Outlet, useLocation } from "react-router";
 import Brand from "../components/layout/Brand";
 import Navigation from "../components/layout/Navigation";
-import { panelNavigation } from "../routes/navigation";
+import { flattenNavigation, panelNavigation } from "../routes/navigation";
+import type { NavigationItem } from "../routes/navigation";
 import { useAuth } from "../auth/AuthContext";
 import { useNavigate } from "react-router";
 import { Button } from "@mui/material";
 import { toast } from "react-toastify";
 import { readableApiError } from "../services/api/client";
 import { defaultAvatarUrl } from "../constants/assets";
+import NotificationBell from "../components/layout/NotificationBell";
 
 const sidebarStateKey = "ara-panel-sidebar-collapsed";
 
@@ -46,23 +48,21 @@ export default function AdminLayout() {
     const { user, logout } = useAuth();
     const membershipRole = user?.memberships[0]?.role;
     const membershipPermissions = user?.memberships[0]?.permissions ?? [];
+    const panelRole = membershipRole === "salon_owner" || membershipRole === "employee" ? membershipRole : undefined;
     const accountRole =
         user?.system_role === "super_admin"
             ? "مدیر کل"
             : membershipRole === "salon_owner"
               ? "مدیر سالن"
               : "کارکنان سالن";
-    const visibleNavigation = panelNavigation.filter(
-        (item) =>
-            user?.system_role === "super_admin" ||
-            (membershipRole &&
-                (!item.roles ||
-                    item.roles.some((role) => role === membershipRole)) &&
-                (membershipRole !== "employee" ||
-                    !item.permission ||
-                    membershipPermissions.includes(item.permission))),
-    );
-    const current = visibleNavigation.find((item) => item.path === pathname);
+    const allowed = (item: NavigationItem) =>
+        user?.system_role === "super_admin" ||
+        Boolean(panelRole && (!item.roles || item.roles.includes(panelRole)) &&
+            (membershipRole !== "employee" || !item.permission || membershipPermissions.includes(item.permission)));
+    const visibleNavigation = panelNavigation.filter(allowed).map((item) => item.children
+        ? { ...item, children: item.children.filter(allowed) }
+        : item).filter((item) => !item.children || item.children.length > 0);
+    const current = flattenNavigation(visibleNavigation).find((item) => item.path === pathname);
     const CurrentIcon = current?.icon ?? Command;
     const today = new Intl.DateTimeFormat("fa-IR", {
         weekday: "long",
@@ -191,6 +191,7 @@ export default function AdminLayout() {
                     </div>
                     <div className="header-account">
                         <span className="header-date">{today}</span>
+                        <NotificationBell />
                         {user?.system_role === "super_admin" && (
                             <Tooltip title="رفتن به اپ مشتری">
                                 <IconButton

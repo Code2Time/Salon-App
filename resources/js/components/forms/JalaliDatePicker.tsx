@@ -1,4 +1,5 @@
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { useState } from "react";
 
 interface JalaliDatePickerProps {
     label: string;
@@ -37,16 +38,22 @@ export default function JalaliDatePicker({
     onChange,
     disableFuture = false,
 }: JalaliDatePickerProps) {
+    const [open, setOpen] = useState(false);
     return (
         <DatePicker
             label={label}
             value={parseGregorianDate(value)}
             onChange={(date) => onChange(toGregorianDateString(date))}
             disableFuture={disableFuture}
+            open={open}
+            onOpen={() => setOpen(true)}
+            onClose={() => setOpen(false)}
             format="yyyy/MM/dd"
             slotProps={{
                 field: { clearable: true },
-                textField: { fullWidth: true },
+                textField: { fullWidth: true, onClick: () => setOpen(true) },
+                desktopPaper: { className: "ara-date-picker" },
+                mobilePaper: { className: "ara-date-picker" },
             }}
         />
     );

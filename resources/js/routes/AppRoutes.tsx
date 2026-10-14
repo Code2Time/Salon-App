@@ -7,7 +7,7 @@ import Home from "../pages/customer/Home";
 import Preview from "../pages/Preview";
 import NotFound from "../pages/NotFound";
 import PlaceholderPage from "../components/common/PlaceholderPage";
-import { customerNavigation, panelNavigation } from "./navigation";
+import { customerNavigation, flattenNavigation, panelNavigation } from "./navigation";
 import RouteAccess from "../components/auth/RouteAccess";
 import AuthPage from "../pages/auth/AuthPage";
 import HomeRedirect from "../pages/auth/HomeRedirect";
@@ -18,6 +18,8 @@ import CustomerProfile from "../pages/customer/Profile";
 import ServiceCategories from "../pages/panel/ServiceCategories";
 import Services from "../pages/panel/Services";
 import CustomerServices from "../pages/customer/Services";
+import AppointmentSettings from "../pages/panel/AppointmentSettings";
+import EmployeeSchedules from "../pages/panel/EmployeeSchedules";
 
 const protectedCustomerPaths = new Set(["/app/booking", "/app/appointments", "/app/profile"]);
 
@@ -30,7 +32,7 @@ export default function AppRoutes() {
             "/register": "ثبت‌نام",
             "/preview": "پیش‌نمایش",
         };
-        const current = [...panelNavigation, ...customerNavigation].find(
+        const current = [...flattenNavigation(panelNavigation), ...customerNavigation].find(
             (item) => item.path === pathname,
         );
         document.title = `${current?.label ?? publicTitles[pathname] ?? "صفحه پیدا نشد"} | آرا`;
@@ -57,7 +59,10 @@ export default function AppRoutes() {
                 <Route path="profile" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/profile")!}><Profile /></PanelPageAccess>} />
                 <Route path="service-categories" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/service-categories")!}><ServiceCategories /></PanelPageAccess>} />
                 <Route path="services" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/services")!}><Services /></PanelPageAccess>} />
-                {panelNavigation.slice(1).filter((item) => !["/panel/users", "/panel/customers", "/panel/employees", "/panel/profile", "/panel/service-categories", "/panel/services"].includes(item.path)).map((item) => (
+                <Route path="appointment-settings" element={<PanelPageAccess item={flattenNavigation(panelNavigation).find((item) => item.path === "/panel/appointment-settings")!}><AppointmentSettings /></PanelPageAccess>} />
+                <Route path="my-schedule" element={<PanelPageAccess item={flattenNavigation(panelNavigation).find((item) => item.path === "/panel/my-schedule")!}><EmployeeSchedules /></PanelPageAccess>} />
+                <Route path="employee-schedules" element={<PanelPageAccess item={flattenNavigation(panelNavigation).find((item) => item.path === "/panel/employee-schedules")!}><EmployeeSchedules management /></PanelPageAccess>} />
+                {flattenNavigation(panelNavigation).slice(1).filter((item) => !["/panel/users", "/panel/customers", "/panel/employees", "/panel/profile", "/panel/service-categories", "/panel/services", "/panel/appointment-settings", "/panel/my-schedule", "/panel/employee-schedules"].includes(item.path) && !item.children?.length).map((item) => (
                     <Route
                         key={item.path}
                         path={item.path.slice("/panel/".length)}

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\SalonRole;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class SalonUser extends Pivot
@@ -28,5 +29,10 @@ class SalonUser extends Pivot
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function availabilityDays(): HasMany
+    {
+        return $this->hasMany(EmployeeAvailabilityDay::class, 'salon_user_id', 'id');
     }
 }

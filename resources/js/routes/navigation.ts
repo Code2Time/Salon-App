@@ -1,5 +1,6 @@
 import {
     CalendarDays,
+    Clock3,
     ChartNoAxesCombined,
     Grid2X2,
     House,
@@ -24,6 +25,7 @@ export interface NavigationItem {
     icon: LucideIcon;
     roles?: Array<"salon_owner" | "employee">;
     permission?: PanelPermission;
+    children?: NavigationItem[];
 }
 
 export const panelNavigation: NavigationItem[] = [
@@ -74,11 +76,43 @@ export const panelNavigation: NavigationItem[] = [
     },
     {
         path: "/panel/appointments",
-        label: "نوبت‌ها",
+        label: "نوبت‌دهی",
         description: "برنامه‌ریزی روزهای کاری سالن",
         icon: CalendarDays,
         roles: ["salon_owner", "employee"],
         permission: "appointments",
+        children: [
+            {
+                path: "/panel/appointments",
+                label: "مدیریت نوبت‌ها",
+                description: "مشاهده و مدیریت نوبت‌های سالن",
+                icon: CalendarDays,
+                roles: ["salon_owner", "employee"],
+                permission: "appointments",
+            },
+            {
+                path: "/panel/my-schedule",
+                label: "برنامه کاری من",
+                description: "ثبت روزها و ساعت‌های حضور من",
+                icon: Clock3,
+                roles: ["employee"],
+                permission: "appointments",
+            },
+            {
+                path: "/panel/employee-schedules",
+                label: "برنامه کارکنان",
+                description: "مشاهده و ویرایش حضور کارکنان",
+                icon: UsersRound,
+                roles: ["salon_owner"],
+            },
+            {
+                path: "/panel/appointment-settings",
+                label: "تنظیمات نوبت‌دهی",
+                description: "تقویم و ساعات کاری سالن",
+                icon: Settings,
+                roles: ["salon_owner"],
+            },
+        ],
     },
     {
         path: "/panel/products",
@@ -111,6 +145,10 @@ export const panelNavigation: NavigationItem[] = [
         roles: ["salon_owner"],
     },
 ];
+
+export function flattenNavigation(items: NavigationItem[]): NavigationItem[] {
+    return items.flatMap((item) => [item, ...flattenNavigation(item.children ?? [])]);
+}
 
 export const customerNavigation: NavigationItem[] = [
     {
