@@ -25,6 +25,7 @@ class CustomerServiceResource extends JsonResource
             'providers' => $this->providers
                 ->filter(fn ($membership) => $membership->user)
                 ->map(fn ($membership) => [
+                    'membership_id' => $membership->id,
                     'name' => $membership->user->name,
                     'image_url' => $this->imageUrl($membership->user->image),
                 ])->values(),

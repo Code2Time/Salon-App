@@ -1,7 +1,8 @@
 import { addDays, addMonths, addWeeks, eachDayOfInterval, endOfMonth, startOfMonth } from "date-fns-jalali";
-import { Alert, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, IconButton, Paper, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Alert, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, IconButton, InputLabel, MenuItem, Paper, Select, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { CalendarDays, ChevronLeft, ChevronRight, Clock3, Pencil, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { isAxiosError } from "axios";
 import { toast } from "react-toastify";
 import JalaliDatePicker from "../../components/forms/JalaliDatePicker";
 import StyledTimePicker from "../../components/forms/StyledTimePicker";
@@ -13,7 +14,7 @@ const faDate = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { weekday: "long", 
 const faWeekday = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { weekday: "long" });
 const faDayMonth = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { day: "numeric", month: "long" });
 const faMonth = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { month: "long", year: "numeric" });
-const defaultSettings: Settings = { planning_period: "weekly", is_recurring: false, timezone: "Asia/Tehran" };
+const defaultSettings: Settings = { planning_period: "weekly", is_recurring: false, timezone: "Asia/Tehran", slot_interval_minutes: 15, cancellation_notice_hours: 5, deposit_enabled: false, deposit_type: null, deposit_value: null };
 const defaultOpenDay: WorkingDayInput = { is_open: true, title: null, description: null, periods: [{ starts_at: "09:00", ends_at: "17:00" }] };
 
 function dateString(date: Date): string {
@@ -41,6 +42,7 @@ export default function AppointmentSettings() {
     const [editingDate, setEditingDate] = useState<string | null>(null);
     const [form, setForm] = useState<WorkingDayInput>(defaultOpenDay);
     const [savingDay, setSavingDay] = useState(false);
+    const [affectedEmployees, setAffectedEmployees] = useState<string[]>([]);
 
     const monthDays = useMemo(() => eachDayOfInterval({ start: startOfMonth(anchor), end: endOfMonth(anchor) }), [anchor]);
     const monthWeeks = useMemo(() => chunks(monthDays, 7), [monthDays]);
@@ -71,22 +73,36 @@ export default function AppointmentSettings() {
         } catch (caught) { toast.error(readableApiError(caught)); }
         finally { setSavingSettings(false); }
     }
+    async function saveDeposit() {
+        setSavingSettings(true);
+        try {
+            const updated = await updateAppointmentSettings({ planning_period: settings.planning_period, is_recurring: settings.is_recurring, deposit_enabled: settings.deposit_enabled, deposit_type: settings.deposit_enabled ? (settings.deposit_type ?? "fixed") : null, deposit_value: settings.deposit_enabled ? (settings.deposit_value ?? 1) : null });
+            setSettings(updated); toast.success("تنظیمات پیش‌پرداخت ذخیره شد.");
+        } catch (caught) { toast.error(readableApiError(caught)); } finally { setSavingSettings(false); }
+    }
 
     function openDay(date: Date) {
         const key = dateString(date);
         const existing = days.find((day) => day.date === key);
         setEditingDate(key);
+        setAffectedEmployees([]);
         setForm(existing ? { is_open: existing.is_open, title: existing.title, description: existing.description, periods: existing.periods.map(({ starts_at, ends_at }) => ({ starts_at, ends_at })) } : defaultOpenDay);
     }
 
-    async function saveDay() {
+    async function saveDay(confirmEmployeeImpact = false) {
         if (!editingDate) return;
         setSavingDay(true);
         try {
-            const saved = await updateSalonWorkingDay(editingDate, form);
+            const saved = await updateSalonWorkingDay(editingDate, { ...form, ...(confirmEmployeeImpact ? { confirm_employee_impact: true } : {}) });
             setDays((current) => [...current.filter((day) => day.date !== saved.date), saved]);
             setEditingDate(null); toast.success("برنامه این روز ذخیره شد.");
-        } catch (caught) { toast.error(readableApiError(caught)); }
+        } catch (caught) {
+            if (isAxiosError(caught) && caught.response?.status === 409 && caught.response.data?.code === "employee_schedule_conflict") {
+                const names = Array.isArray(caught.response.data.employees) ? caught.response.data.employees.map((employee: { name: string }) => employee.name) : [];
+                setAffectedEmployees(names);
+                toast.warning("این روز دارای برنامه حضور کارکنان است و به تأیید شما نیاز دارد.");
+            } else toast.error(readableApiError(caught));
+        }
         finally { setSavingDay(false); }
     }
 
@@ -113,6 +129,12 @@ export default function AppointmentSettings() {
                 <ToggleButton value="weekly">هفتگی</ToggleButton><ToggleButton value="monthly">ماهانه</ToggleButton>
             </ToggleButtonGroup>
             <FormControlLabel control={<Switch checked={settings.is_recurring} disabled={savingSettings} onChange={(event) => void changeSettings(settings.planning_period, event.target.checked)} />} label="تکرار برنامه برای دوره‌های بعد" />
+        </Paper>
+        <Paper variant="outlined" className="schedule-preferences deposit-preferences">
+            <div><Typography variant="h3">پیش‌پرداخت نوبت</Typography><Typography color="text.secondary" variant="body2">مبلغ موردنیاز برای هر نوبت محاسبه و برای اتصال درگاه ذخیره می‌شود.</Typography></div>
+            <FormControlLabel control={<Switch checked={settings.deposit_enabled} onChange={(event) => setSettings((current) => ({ ...current, deposit_enabled: event.target.checked }))} />} label="پیش‌پرداخت فعال باشد" />
+            {settings.deposit_enabled && <><FormControl size="small"><InputLabel>نوع مبلغ</InputLabel><Select label="نوع مبلغ" value={settings.deposit_type ?? "fixed"} onChange={(event) => setSettings((current) => ({ ...current, deposit_type: event.target.value as "fixed" | "percentage" }))}><MenuItem value="fixed">مبلغ ثابت</MenuItem><MenuItem value="percentage">درصد مبلغ نوبت</MenuItem></Select></FormControl><TextField size="small" type="number" label={settings.deposit_type === "percentage" ? "درصد" : "مبلغ (تومان)"} value={settings.deposit_value ?? ""} onChange={(event) => setSettings((current) => ({ ...current, deposit_value: Number(event.target.value) }))} /></>}
+            <Button variant="contained" disabled={savingSettings} onClick={() => void saveDeposit()}>ذخیره پیش‌پرداخت</Button>
         </Paper>
 
         <Paper variant="outlined" className="schedule-calendar">
@@ -145,12 +167,13 @@ export default function AppointmentSettings() {
         <Dialog open={Boolean(editingDate)} onClose={() => !savingDay && setEditingDate(null)} fullWidth maxWidth="sm" slotProps={{ paper: { className: "working-day-dialog" } }}>
             <DialogTitle>برنامه {editingDate ? faDate.format(parseDate(editingDate)) : "روز"}</DialogTitle>
             <DialogContent className="working-day-form">
+                {affectedEmployees.length > 0 && <Alert severity="warning"><strong>هشدار تغییر برنامه کارکنان</strong><br />با تعطیل‌کردن این روز، حضور {affectedEmployees.join("، ")} لغو می‌شود و برای آن‌ها اعلان ارسال خواهد شد.</Alert>}
                 <FormControlLabel control={<Switch checked={form.is_open} onChange={(event) => setForm((current) => ({ ...current, is_open: event.target.checked, periods: event.target.checked && current.periods.length === 0 ? [{ starts_at: "09:00", ends_at: "17:00" }] : current.periods }))} />} label={form.is_open ? "سالن در این روز باز است" : "سالن در این روز بسته است"} />
                 <TextField label="عنوان (اختیاری)" value={form.title ?? ""} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value || null }))} placeholder="مثلاً تعطیل رسمی یا ساعت کاری ویژه" />
                 <TextField label="توضیحات (اختیاری)" value={form.description ?? ""} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value || null }))} multiline minRows={2} />
                 {form.is_open && <div className="working-period-list"><div className="working-period-heading"><strong>بازه‌های کاری</strong><Button size="small" onClick={() => setForm((current) => ({ ...current, periods: [...current.periods, { starts_at: "09:00", ends_at: "17:00" }] }))}><Plus size={16} /> افزودن بازه</Button></div>{form.periods.map((period, index) => <div className="working-period-row" key={index}><StyledTimePicker label="شروع" value={period.starts_at} onChange={(value) => updatePeriod(index, { starts_at: value })} /><StyledTimePicker label="پایان" value={period.ends_at} onChange={(value) => updatePeriod(index, { ends_at: value })} /><IconButton color="error" aria-label="حذف بازه" onClick={() => setForm((current) => ({ ...current, periods: current.periods.filter((_period, itemIndex) => itemIndex !== index) }))}><Trash2 size={18} /></IconButton></div>)}</div>}
             </DialogContent>
-            <DialogActions><Button color="inherit" disabled={savingDay} onClick={() => setEditingDate(null)}>انصراف</Button><Button variant="contained" disabled={savingDay} onClick={() => void saveDay()}><Save size={17} /> {savingDay ? "در حال ذخیره…" : "ذخیره برنامه"}</Button></DialogActions>
+            <DialogActions><Button color="inherit" disabled={savingDay} onClick={() => setEditingDate(null)}>انصراف</Button><Button variant="contained" color={affectedEmployees.length ? "warning" : "primary"} disabled={savingDay} onClick={() => void saveDay(affectedEmployees.length > 0)}><Save size={17} /> {savingDay ? "در حال ذخیره…" : affectedEmployees.length ? "تأیید تعطیلی و ارسال اعلان" : "ذخیره برنامه"}</Button></DialogActions>
         </Dialog>
     </section>;
 }

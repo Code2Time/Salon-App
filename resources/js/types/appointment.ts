@@ -1,0 +1,4 @@
+export interface BookingItemInput { service_id: number; employee_membership_id: number; }
+export interface AppointmentItem { id: number; service_id: number | null; service_name: string; employee_membership_id: number; employee_name: string; price: number; duration_minutes: number; starts_at: string; ends_at: string; }
+export interface Appointment { id: number; status: "pending" | "confirmed" | "completed" | "cancelled" | "no_show" | "rejected"; source: "customer" | "panel"; starts_at: string; ends_at: string; total_price: number; required_deposit_amount: number; notes: string | null; cancellation_reason: string | null; customer?: { id: number; name: string; mobile: string }; items: AppointmentItem[]; }
+export interface AppointmentPage { data: Appointment[]; meta: { current_page: number; last_page: number; total: number } }

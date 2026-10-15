@@ -14,7 +14,7 @@ class ServiceSeeder extends Seeder
     {
         $salon = Salon::query()->where('slug', 'ara')->firstOrFail();
         $categories = $salon->serviceCategories()->pluck('id', 'name');
-        $employeeMobiles = ['09111111101', '09111111102', '09111111103', '09111111104'];
+        $employeeMobiles = ['09222222222', '09333333333'];
         $providers = SalonUser::query()
             ->where('salon_id', $salon->id)
             ->where('role', SalonRole::Employee->value)
@@ -55,7 +55,7 @@ class ServiceSeeder extends Seeder
             $service->deleted_at = null;
             $service->save();
             $service->categories()->sync(collect($data['categories'])->map(fn ($name) => $categories->get($name))->filter()->all());
-            $service->providers()->sync(collect($data['providers'])->map(fn ($index) => $providers->get($index))->filter()->all());
+            $service->providers()->sync($providers->all());
         }
     }
 }

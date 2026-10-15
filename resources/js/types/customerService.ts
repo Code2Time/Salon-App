@@ -7,6 +7,7 @@ export interface CustomerServiceCategory {
 }
 
 export interface CustomerServiceProvider {
+    membership_id: number;
     name: string;
     image_url: string | null;
 }

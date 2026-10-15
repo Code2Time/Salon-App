@@ -1,2 +1,5 @@
 *
 !.gitignore
+!service-categories/
+service-categories/*
+!service-categories/*.jpg

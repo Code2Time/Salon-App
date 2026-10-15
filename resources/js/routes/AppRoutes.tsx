@@ -20,8 +20,11 @@ import Services from "../pages/panel/Services";
 import CustomerServices from "../pages/customer/Services";
 import AppointmentSettings from "../pages/panel/AppointmentSettings";
 import EmployeeSchedules from "../pages/panel/EmployeeSchedules";
+import PanelAppointments from "../pages/panel/Appointments";
+import CustomerAppointments from "../pages/customer/Appointments";
+import Notifications from "../pages/Notifications";
 
-const protectedCustomerPaths = new Set(["/app/booking", "/app/appointments", "/app/profile"]);
+const protectedCustomerPaths = new Set(["/app/appointments", "/app/profile"]);
 
 export default function AppRoutes() {
     const { pathname } = useLocation();
@@ -31,6 +34,8 @@ export default function AppRoutes() {
             "/login": "ورود",
             "/register": "ثبت‌نام",
             "/preview": "پیش‌نمایش",
+            "/panel/notifications": "اعلان‌ها",
+            "/app/notifications": "اعلان‌ها",
         };
         const current = [...flattenNavigation(panelNavigation), ...customerNavigation].find(
             (item) => item.path === pathname,
@@ -62,7 +67,9 @@ export default function AppRoutes() {
                 <Route path="appointment-settings" element={<PanelPageAccess item={flattenNavigation(panelNavigation).find((item) => item.path === "/panel/appointment-settings")!}><AppointmentSettings /></PanelPageAccess>} />
                 <Route path="my-schedule" element={<PanelPageAccess item={flattenNavigation(panelNavigation).find((item) => item.path === "/panel/my-schedule")!}><EmployeeSchedules /></PanelPageAccess>} />
                 <Route path="employee-schedules" element={<PanelPageAccess item={flattenNavigation(panelNavigation).find((item) => item.path === "/panel/employee-schedules")!}><EmployeeSchedules management /></PanelPageAccess>} />
-                {flattenNavigation(panelNavigation).slice(1).filter((item) => !["/panel/users", "/panel/customers", "/panel/employees", "/panel/profile", "/panel/service-categories", "/panel/services", "/panel/appointment-settings", "/panel/my-schedule", "/panel/employee-schedules"].includes(item.path) && !item.children?.length).map((item) => (
+                <Route path="appointments" element={<PanelPageAccess item={flattenNavigation(panelNavigation).find((item) => item.path === "/panel/appointments")!}><PanelAppointments /></PanelPageAccess>} />
+                <Route path="notifications" element={<Notifications />} />
+                {flattenNavigation(panelNavigation).slice(1).filter((item) => !["/panel/users", "/panel/customers", "/panel/employees", "/panel/profile", "/panel/service-categories", "/panel/services", "/panel/appointment-settings", "/panel/my-schedule", "/panel/employee-schedules", "/panel/appointments"].includes(item.path) && !item.children?.length).map((item) => (
                     <Route
                         key={item.path}
                         path={item.path.slice("/panel/".length)}
@@ -79,7 +86,9 @@ export default function AppRoutes() {
                 <Route index element={<Home />} />
                 <Route path="services" element={<CustomerServices />} />
                 <Route path="profile" element={<RouteAccess area="customer"><CustomerProfile /></RouteAccess>} />
-                {customerNavigation.slice(1).filter((item) => !["/app/profile", "/app/services"].includes(item.path)).map((item) => (
+                <Route path="appointments" element={<RouteAccess area="customer"><CustomerAppointments /></RouteAccess>} />
+                <Route path="notifications" element={<RouteAccess area="customer"><Notifications /></RouteAccess>} />
+                {customerNavigation.slice(1).filter((item) => !["/app/profile", "/app/services", "/app/appointments"].includes(item.path)).map((item) => (
                     <Route
                         key={item.path}
                         path={item.path.slice("/app/".length)}

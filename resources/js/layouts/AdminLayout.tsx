@@ -10,6 +10,7 @@ import {
 import {
     ArrowLeftRight,
     ArrowUpLeft,
+    Bell,
     ChevronDown,
     Command,
     Menu,
@@ -62,7 +63,12 @@ export default function AdminLayout() {
     const visibleNavigation = panelNavigation.filter(allowed).map((item) => item.children
         ? { ...item, children: item.children.filter(allowed) }
         : item).filter((item) => !item.children || item.children.length > 0);
-    const current = flattenNavigation(visibleNavigation).find((item) => item.path === pathname);
+    const current = flattenNavigation(visibleNavigation).find((item) => item.path === pathname) ?? (pathname === "/panel/notifications" ? {
+        path: "/panel/notifications",
+        label: "اعلان‌ها",
+        description: "پیام‌ها و رویدادهای مهم حساب شما",
+        icon: Bell,
+    } : undefined);
     const CurrentIcon = current?.icon ?? Command;
     const today = new Intl.DateTimeFormat("fa-IR", {
         weekday: "long",

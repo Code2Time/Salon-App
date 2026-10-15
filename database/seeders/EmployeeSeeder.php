@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\SalonRole;
 use App\Models\Salon;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 
 class EmployeeSeeder extends Seeder
@@ -13,10 +14,8 @@ class EmployeeSeeder extends Seeder
     {
         $salon = Salon::query()->where('slug', 'ara')->firstOrFail();
         $employees = [
-            ['mobile' => '09111111101', 'first_name' => 'مریم', 'last_name' => 'احمدی'],
-            ['mobile' => '09111111102', 'first_name' => 'نگار', 'last_name' => 'کریمی'],
-            ['mobile' => '09111111103', 'first_name' => 'سارا', 'last_name' => 'محمدی'],
-            ['mobile' => '09111111104', 'first_name' => 'الهام', 'last_name' => 'رضایی'],
+            ['mobile' => '09222222222', 'first_name' => 'کارمند', 'last_name' => 'آزمایشی'],
+            ['mobile' => '09333333333', 'first_name' => 'کارمند دوم', 'last_name' => 'آزمایشی', 'seed_schedule' => true],
         ];
 
         foreach ($employees as $data) {
@@ -26,6 +25,7 @@ class EmployeeSeeder extends Seeder
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
                 'mobile_verified_at' => now(),
+                'system_role' => null,
                 'is_active' => true,
             ]);
             $user->deleted_at = null;
@@ -34,13 +34,38 @@ class EmployeeSeeder extends Seeder
             $salon->users()->syncWithoutDetaching([
                 $user->id => [
                     'role' => SalonRole::Employee->value,
-                    'permissions' => json_encode([
+                    'permissions' => [
                         'dashboard', 'service_categories', 'manage_service_categories',
                         'services', 'manage_services', 'appointments',
-                    ], JSON_UNESCAPED_UNICODE),
+                    ],
                     'is_active' => true,
                 ],
             ]);
+
+            if ($data['seed_schedule'] ?? false) {
+                $membership = $salon->users()->whereKey($user->id)->firstOrFail()->pivot;
+                $date = CarbonImmutable::now('Asia/Tehran')->startOfDay();
+                $seededDays = 0;
+
+                while ($seededDays < 3) {
+                    $salonDay = $salon->workingDays()->whereDate('date', $date->toDateString())->first();
+                    if ($salonDay?->is_open ?? true) {
+                        $day = $membership->availabilityDays()->updateOrCreate(
+                            ['date' => $date->toDateString()],
+                            ['is_present' => true],
+                        );
+                        $day->periods()->delete();
+                        $day->periods()->create([
+                            'starts_at' => '09:00',
+                            'ends_at' => '17:00',
+                            'sort_order' => 0,
+                        ]);
+                        $seededDays++;
+                    }
+
+                    $date = $date->addDay();
+                }
+            }
         }
     }
 }

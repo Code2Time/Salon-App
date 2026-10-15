@@ -5,6 +5,7 @@ namespace Tests\Feature\Panel;
 use App\Enums\SalonRole;
 use App\Models\AppointmentSetting;
 use App\Models\Salon;
+use App\Models\SalonUser;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -78,6 +79,41 @@ class AppointmentScheduleManagementTest extends TestCase
             'is_open' => true,
             'periods' => [['starts_at' => '18:00', 'ends_at' => '09:00']],
         ])->assertUnprocessable()->assertJsonValidationErrors('periods.0.ends_at');
+    }
+
+    public function test_closing_day_requires_confirmation_and_notifies_scheduled_employees(): void
+    {
+        [$owner, $salon] = $this->ownerWithSalon();
+        $employee = User::factory()->create(['name' => 'کارمند برنامه‌دار']);
+        $salon->users()->attach($employee, [
+            'role' => SalonRole::Employee->value,
+            'permissions' => ['appointments'],
+            'is_active' => true,
+        ]);
+        $membership = SalonUser::query()->where('salon_id', $salon->id)->where('user_id', $employee->id)->firstOrFail();
+        $employeeDay = $membership->availabilityDays()->create(['date' => '2026-10-20', 'is_present' => true]);
+        $employeeDay->periods()->create(['starts_at' => '09:00', 'ends_at' => '17:00']);
+        $payload = ['is_open' => false, 'title' => 'تعطیل', 'description' => null, 'periods' => []];
+
+        $this->actingAs($owner)->putJson('/api/panel/appointment-schedule/days/2026-10-20', $payload)
+            ->assertStatus(409)
+            ->assertJsonPath('code', 'employee_schedule_conflict')
+            ->assertJsonPath('employees.0.name', 'کارمند برنامه‌دار');
+        $this->assertDatabaseHas('employee_availability_days', ['id' => $employeeDay->id, 'is_present' => true]);
+        $this->assertDatabaseCount('notifications', 0);
+
+        $this->actingAs($owner)->putJson('/api/panel/appointment-schedule/days/2026-10-20', [
+            ...$payload,
+            'confirm_employee_impact' => true,
+        ])->assertOk()->assertJsonPath('data.is_open', false);
+
+        $this->assertDatabaseHas('employee_availability_days', ['id' => $employeeDay->id, 'is_present' => false]);
+        $this->assertDatabaseMissing('employee_availability_periods', ['employee_availability_day_id' => $employeeDay->id]);
+        $this->assertDatabaseCount('notifications', 1);
+        $this->actingAs($employee)->getJson('/api/notifications')
+            ->assertOk()
+            ->assertJsonPath('data.0.title', 'روز کاری شما لغو شد')
+            ->assertJsonPath('data.0.date', '2026-10-20');
     }
 
     public function test_employee_cannot_read_or_change_appointment_settings(): void

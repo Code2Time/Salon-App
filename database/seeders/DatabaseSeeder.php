@@ -3,11 +3,11 @@
 namespace Database\Seeders;
 
 use App\Enums\SalonRole;
-use App\Enums\SystemRole;
 use App\Models\Salon;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,17 +18,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $legacyMobiles = [
+            '09111111001',
+            '09111111002',
+            '09111111003',
+            '09111111004',
+            '09111111005',
+            '09111111101',
+            '09111111102',
+            '09111111103',
+            '09111111104',
+        ];
+        $legacyUserIds = User::withTrashed()->whereIn('mobile', $legacyMobiles)->pluck('id');
+        DB::table('salon_user')->whereIn('user_id', $legacyUserIds)->update(['is_active' => false]);
+        User::query()->whereIn('id', $legacyUserIds)->delete();
+
         $salon = Salon::query()->updateOrCreate(
             ['slug' => 'ara'],
             ['name' => 'سالن آرا', 'is_active' => true],
         );
 
         $users = [
-            ['mobile' => '09111111001', 'first_name' => 'مدیر کل', 'last_name' => 'آزمایشی', 'system_role' => SystemRole::SuperAdmin],
-            ['mobile' => '09111111002', 'first_name' => 'مالک', 'last_name' => 'آزمایشی', 'role' => SalonRole::Owner],
-            ['mobile' => '09111111003', 'first_name' => 'مدیر دوم', 'last_name' => 'آزمایشی', 'role' => SalonRole::Owner],
-            ['mobile' => '09111111004', 'first_name' => 'کارمند', 'last_name' => 'آزمایشی', 'role' => SalonRole::Employee],
-            ['mobile' => '09111111005', 'first_name' => 'مشتری', 'last_name' => 'آزمایشی'],
+            ['mobile' => '09333218766', 'first_name' => 'مدیر', 'last_name' => 'سالن', 'role' => SalonRole::Owner],
+            ['mobile' => '09111111111', 'first_name' => 'مشتری', 'last_name' => 'آزمایشی', 'role' => SalonRole::Customer],
         ];
 
         foreach ($users as $data) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Panel;
 
 use App\Enums\SalonRole;
 use App\Http\Controllers\Controller;
+use App\Models\AppointmentItem;
 use App\Models\SalonUser;
 use App\Notifications\WorkScheduleChanged;
 use App\Services\CurrentSalon;
@@ -11,6 +12,8 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class EmployeeScheduleController extends Controller
@@ -20,8 +23,10 @@ class EmployeeScheduleController extends Controller
         $this->ensureOwner($request, $context);
         $employees = SalonUser::query()->where('salon_id', $context->get()->id)
             ->where('role', SalonRole::Employee->value)->where('is_active', true)
+            ->whereHas('user', fn ($query) => $query->where('is_active', true))
             ->with('user:id,name,image')->get()->map(fn ($member) => [
                 'membership_id' => $member->id, 'name' => $member->user->name,
+                'image_url' => $this->imageUrl($member->user->image),
             ]);
 
         return response()->json(['data' => $employees]);
@@ -60,7 +65,11 @@ class EmployeeScheduleController extends Controller
         }
 
         return response()->json(['data' => [
-            'employee' => ['membership_id' => $membership->id, 'name' => $membership->user->name],
+            'employee' => [
+                'membership_id' => $membership->id,
+                'name' => $membership->user->name,
+                'image_url' => $this->imageUrl($membership->user->image),
+            ],
             'planning_period' => $context->get()->appointmentSetting?->planning_period ?? 'weekly',
             'days' => $days,
         ]]);
@@ -100,6 +109,7 @@ class EmployeeScheduleController extends Controller
                 throw ValidationException::withMessages(["periods.{$index}" => 'بازه حضور باید داخل ساعات کاری سالن باشد.']);
             }
         }
+        $this->ensureAppointmentsRemainValid($membership, $date, (bool) $input['is_present'], $periods);
 
         DB::transaction(function () use ($membership, $date, $input, $periods) {
             $day = $membership->availabilityDays()->updateOrCreate(['date' => $date], ['is_present' => $input['is_present']]);
@@ -121,14 +131,15 @@ class EmployeeScheduleController extends Controller
     private function membership(Request $request, CurrentSalon $context, ?int $requestedId): SalonUser
     {
         $query = SalonUser::query()->where('salon_id', $context->get()->id)
-            ->where('role', SalonRole::Employee->value)->where('is_active', true)->with('user');
+            ->where('role', SalonRole::Employee->value)->where('is_active', true)
+            ->whereHas('user', fn ($query) => $query->where('is_active', true))->with('user');
         if ($this->isOwner($request, $context)) {
             abort_unless($requestedId, 422, 'انتخاب کارمند الزامی است.');
 
             return $query->findOrFail($requestedId);
         }
         $membership = $query->where('user_id', $request->user()->id)->firstOrFail();
-        abort_unless(in_array('appointments', $membership->permissions ?? [], true), 403);
+        abort_unless(in_array('appointments', $membership->permissionNames(), true), 403);
         abort_if($requestedId && $requestedId !== $membership->id, 403);
 
         return $membership;
@@ -148,5 +159,36 @@ class EmployeeScheduleController extends Controller
     private function period(object $period): array
     {
         return ['starts_at' => substr($period->starts_at, 0, 5), 'ends_at' => substr($period->ends_at, 0, 5)];
+    }
+
+    private function imageUrl(?string $image): ?string
+    {
+        if (! $image) {
+            return null;
+        }
+
+        return Str::startsWith($image, ['http://', 'https://', '/']) ? $image : Storage::url($image);
+    }
+
+    private function ensureAppointmentsRemainValid(SalonUser $membership, string $date, bool $isPresent, $periods): void
+    {
+        $timezone = $membership->user->salons()->whereKey($membership->salon_id)->first()?->appointmentSetting?->timezone ?? 'Asia/Tehran';
+        $start = CarbonImmutable::createFromFormat('Y-m-d H:i', "{$date} 00:00", $timezone)->utc();
+        $end = $start->addDay();
+        $items = AppointmentItem::query()->where('salon_user_id', $membership->id)
+            ->whereHas('appointment', fn ($query) => $query->whereNotIn('status', ['cancelled', 'rejected']))
+            ->where('starts_at', '>=', $start)->where('starts_at', '<', $end)->get();
+        $conflicts = $items->filter(function ($item) use ($isPresent, $periods, $timezone) {
+            if (! $isPresent) {
+                return true;
+            }
+            $itemStart = $item->starts_at->timezone($timezone)->format('H:i');
+            $itemEnd = $item->ends_at->timezone($timezone)->format('H:i');
+
+            return ! $periods->contains(fn ($period) => $itemStart >= $period['starts_at'] && $itemEnd <= $period['ends_at']);
+        })->pluck('appointment_id')->unique()->values();
+        if ($conflicts->isNotEmpty()) {
+            throw ValidationException::withMessages(['appointments' => 'ابتدا نوبت‌های متداخل را جابه‌جا یا لغو کنید: '.$conflicts->implode('، ')]);
+        }
     }
 }

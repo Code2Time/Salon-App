@@ -6,6 +6,7 @@ use App\Enums\SalonRole;
 use App\Models\Salon;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class EmployeeScheduleManagementTest extends TestCase
@@ -56,10 +57,43 @@ class EmployeeScheduleManagementTest extends TestCase
             'periods' => [['starts_at' => '09:00', 'ends_at' => '14:00']],
         ])->assertOk();
         $this->assertDatabaseCount('notifications', 1);
-        $this->actingAs($employee)->getJson('/api/panel/notifications')
-            ->assertOk()->assertJsonPath('data.0.title', 'برنامه کاری شما ویرایش شد');
+        $this->actingAs($employee)->getJson('/api/notifications')
+            ->assertOk()
+            ->assertJsonPath('data.0.title', 'برنامه کاری شما ویرایش شد')
+            ->assertJsonPath('data.0.date', '2026-10-18');
+        $this->actingAs($employee)->postJson('/api/notifications/read-all')->assertOk();
+        $this->assertNotNull($employee->notifications()->firstOrFail()->read_at);
         $this->actingAs($owner)->getJson('/api/panel/employee-schedule/employees')
             ->assertOk()->assertJsonPath('data.0.membership_id', $membershipId);
+    }
+
+    public function test_deleted_employees_are_ignored_in_management_filter(): void
+    {
+        [$owner, , $salon, $membershipId] = $this->team();
+        $deletedEmployee = User::factory()->create();
+        $salon->users()->attach($deletedEmployee, [
+            'role' => SalonRole::Employee->value,
+            'permissions' => ['appointments'],
+            'is_active' => true,
+        ]);
+        $deletedEmployee->delete();
+
+        $this->actingAs($owner)->getJson('/api/panel/employee-schedule/employees')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.membership_id', $membershipId);
+    }
+
+    public function test_legacy_double_encoded_permissions_do_not_break_employee_schedule(): void
+    {
+        [, $employee, , $membershipId] = $this->team();
+        DB::table('salon_user')->where('id', $membershipId)->update([
+            'permissions' => json_encode(json_encode(['appointments'])),
+        ]);
+
+        $this->actingAs($employee)->getJson('/api/panel/employee-schedule?from=2026-10-15&to=2026-10-21')
+            ->assertOk()
+            ->assertJsonPath('data.employee.membership_id', $membershipId);
     }
 
     private function team(): array

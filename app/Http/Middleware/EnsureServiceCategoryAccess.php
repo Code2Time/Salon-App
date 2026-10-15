@@ -24,7 +24,7 @@ class EnsureServiceCategoryAccess
             ->wherePivot('is_active', true)
             ->first();
         $role = $membership?->pivot->role;
-        $permissions = $membership?->pivot->permissions ?? [];
+        $permissions = $membership?->pivot->permissionNames() ?? [];
         $isOwner = $role === SalonRole::Owner;
         $canManage = $isOwner || in_array('manage_service_categories', $permissions, true);
         $canView = $canManage || in_array('service_categories', $permissions, true);

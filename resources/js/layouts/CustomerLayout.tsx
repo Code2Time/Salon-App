@@ -9,6 +9,7 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { readableApiError } from "../services/api/client";
 import { defaultAvatarUrl } from "../constants/assets";
+import NotificationBell from "../components/layout/NotificationBell";
 
 export default function CustomerLayout() {
     const { pathname } = useLocation();
@@ -41,6 +42,7 @@ export default function CustomerLayout() {
                         )}
                         {user ? (
                             <>
+                                <NotificationBell />
                                 <Link to="/app/profile" className="account-profile-link" aria-label="مشاهده پروفایل من">
                                     <span className="account-profile-copy">
                                         <strong>{user.name}</strong>

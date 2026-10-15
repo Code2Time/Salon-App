@@ -13,6 +13,7 @@ class UpdateSalonWorkingDayRequest extends FormRequest
             'is_open' => ['required', 'boolean'],
             'title' => ['nullable', 'string', 'max:150'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'confirm_employee_impact' => ['sometimes', 'boolean'],
             'periods' => ['present', 'array', function (string $attribute, mixed $value, Closure $fail): void {
                 if ($this->boolean('is_open') && count($value) === 0) {
                     $fail('برای روز باز حداقل یک بازه کاری وارد کنید.');

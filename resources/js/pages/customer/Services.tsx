@@ -1,7 +1,7 @@
 import { Alert, Avatar, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, IconButton, Paper, Typography } from "@mui/material";
 import { ArrowLeft, Clock3, Sparkles, UserRound, WalletCards, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { defaultAvatarUrl } from "../../constants/assets";
+import { defaultAvatarUrl, logoUrl } from "../../constants/assets";
 import { readableApiError } from "../../services/api/client";
 import { fetchCustomerServices } from "../../services/api/customerServices";
 import type { CustomerService } from "../../types/customerService";
@@ -54,7 +54,7 @@ export default function CustomerServices() {
                                 style={service.categories[0]?.image_url ? { backgroundImage: `url(${service.categories[0].image_url})` } : undefined}
                             >
                                 <span>{service.categories[0]?.name || "خدمات زیبایی"}</span>
-                                {!service.categories[0]?.image_url && <Sparkles size={28} />}
+                                {!service.categories[0]?.image_url && <img className="customer-service-default-logo" src={logoUrl} alt="لوگوی آرا" />}
                             </div>
                             <div className="customer-service-copy">
                                 <div className="customer-service-title">
@@ -77,6 +77,7 @@ export default function CustomerServices() {
                     className={`customer-service-dialog-hero${selected?.categories[0]?.image_url ? " has-image" : ""}`}
                     style={selected?.categories[0]?.image_url ? { backgroundImage: `url(${selected.categories[0].image_url})` } : undefined}
                 >
+                    {!selected?.categories[0]?.image_url && <img className="customer-service-default-logo" src={logoUrl} alt="لوگوی آرا" />}
                     <IconButton aria-label="بستن" onClick={() => setSelected(null)}><X size={19} /></IconButton>
                     <div className="customer-service-dialog-heading">
                         <span>معرفی خدمت</span>
@@ -98,7 +99,7 @@ export default function CustomerServices() {
                         {selected?.providers.length ? <div className="customer-service-provider-grid">{selected.providers.map((provider) => <div key={provider.name}><Avatar src={provider.image_url || defaultAvatarUrl} alt={provider.name} /><span>{provider.name}</span></div>)}</div> : <Typography variant="body2" color="text.secondary">متخصص مناسب هنگام رزرو مشخص می‌شود.</Typography>}
                     </div>
                 </DialogContent>
-                <DialogActions><Typography variant="body2">رزرو آنلاین این خدمت در مرحله بعد فعال می‌شود.</Typography><Button variant="contained" onClick={() => setSelected(null)}>متوجه شدم</Button></DialogActions>
+                <DialogActions><Typography variant="body2">رزرو آنلاین فعلاً از اپ مشتری در دسترس نیست.</Typography><Button variant="contained" onClick={() => setSelected(null)}>بستن</Button></DialogActions>
             </Dialog>
         </section>
     );

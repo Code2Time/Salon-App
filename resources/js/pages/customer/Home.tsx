@@ -32,10 +32,10 @@ export default function Home() {
                     </Typography>
                     <Button
                         component={Link}
-                        to="/app/booking"
+                        to="/app/services"
                         variant="contained"
                     >
-                        رزرو نوبت <ArrowLeft size={19} />
+                        مشاهده خدمات <ArrowLeft size={19} />
                     </Button>
                     <span className="hero-caption">
                         معرفی نمایشی سالن زیبایی آرا

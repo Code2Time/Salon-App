@@ -46,4 +46,9 @@ class Salon extends Model
     {
         return $this->hasMany(SalonWorkingDay::class);
     }
+
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
 }

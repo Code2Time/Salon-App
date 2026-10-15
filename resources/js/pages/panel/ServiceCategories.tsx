@@ -22,6 +22,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../../auth/AuthContext";
+import { logoUrl } from "../../constants/assets";
 import { readableApiError } from "../../services/api/client";
 import {
     createServiceCategory,
@@ -208,8 +209,8 @@ export default function ServiceCategories() {
                 <div className="category-grid">
                     {categories.map((category) => (
                         <Paper variant="outlined" className="category-card" key={category.id}>
-                            <div className="category-cover">
-                                {category.image_url ? <img src={category.image_url} alt="" /> : <Shapes size={42} strokeWidth={1.2} />}
+                            <div className={`category-cover${category.image_url ? "" : " is-default"}`}>
+                                <img src={category.image_url || logoUrl} alt={category.image_url ? `تصویر دسته‌بندی ${category.name}` : "لوگوی پیش‌فرض آرا"} />
                                 <div className="category-badges">
                                     {category.is_featured && <Chip className="category-featured-chip" icon={<Sparkles size={14} />} label="ویژه" size="small" />}
                                     <Chip className={category.is_active ? "category-active-chip" : "category-inactive-chip"} label={category.is_active ? "فعال" : "غیرفعال"} size="small" />
@@ -238,7 +239,7 @@ export default function ServiceCategories() {
                     <DialogTitle>{editing ? "ویرایش دسته‌بندی" : "ایجاد دسته‌بندی"}</DialogTitle>
                     <DialogContent className="category-form">
                         <div className="category-image-field">
-                            <div className="category-image-preview">{imagePreview ? <img src={imagePreview} alt="پیش‌نمایش دسته‌بندی" /> : <Shapes size={34} />}</div>
+                            <div className={`category-image-preview${imagePreview ? "" : " is-default"}`}><img src={imagePreview || logoUrl} alt={imagePreview ? "پیش‌نمایش دسته‌بندی" : "لوگوی پیش‌فرض آرا"} /></div>
                             <div><Button component="label" color="inherit"><ImagePlus size={17} /> انتخاب تصویر<input hidden type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; setForm({ ...form, image: file }); setImagePreview(URL.createObjectURL(file)); }} /></Button><span>JPG، PNG یا WebP؛ حداکثر ۲ مگابایت</span></div>
                         </div>
                         <TextField label="نام دسته‌بندی" required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />

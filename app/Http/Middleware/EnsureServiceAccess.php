@@ -23,7 +23,7 @@ class EnsureServiceAccess
             ->whereKey($this->context->get()->id)
             ->wherePivot('is_active', true)
             ->first();
-        $permissions = $membership?->pivot->permissions ?? [];
+        $permissions = $membership?->pivot->permissionNames() ?? [];
         $isOwner = $membership?->pivot->role === SalonRole::Owner;
         $canManage = $isOwner || in_array('manage_services', $permissions, true);
         $canView = $canManage || in_array('services', $permissions, true);

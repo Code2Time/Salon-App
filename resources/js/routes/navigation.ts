@@ -9,7 +9,6 @@ import {
     Scissors,
     Settings,
     Shapes,
-    Sparkles,
     UserRound,
     UserRoundCog,
     CircleUserRound,
@@ -162,12 +161,6 @@ export const customerNavigation: NavigationItem[] = [
         label: "خدمات",
         description: "زمانی برای رسیدگی به خودتان",
         icon: Grid2X2,
-    },
-    {
-        path: "/app/booking",
-        label: "رزرو",
-        description: "اولین قدم برای یک حال خوب",
-        icon: Sparkles,
     },
     {
         path: "/app/appointments",

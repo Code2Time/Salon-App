@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\UpdateAppointmentSettingsRequest;
 use App\Http\Requests\Panel\UpdateSalonWorkingDayRequest;
 use App\Models\AppointmentSetting;
+use App\Models\EmployeeAvailabilityDay;
 use App\Models\SalonWorkingDay;
+use App\Notifications\WorkDayCancelled;
 use App\Services\CurrentSalon;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
@@ -57,8 +59,33 @@ class AppointmentScheduleController extends Controller
         abort_if(! $parsedDate || $parsedDate->format('Y-m-d') !== $date, 404);
 
         $data = $request->validated();
-        $day = DB::transaction(function () use ($context, $date, $data) {
-            $day = $context->get()->workingDays()->updateOrCreate(
+        $salon = $context->get();
+        $affectedDays = collect();
+        if (! $data['is_open']) {
+            $affectedDays = EmployeeAvailabilityDay::query()
+                ->whereDate('date', $date)
+                ->where('is_present', true)
+                ->whereHas('membership', fn ($query) => $query
+                    ->where('salon_id', $salon->id)
+                    ->where('is_active', true)
+                    ->whereHas('user', fn ($userQuery) => $userQuery->where('is_active', true)))
+                ->with('membership.user:id,name')
+                ->get();
+
+            if ($affectedDays->isNotEmpty() && ! ($data['confirm_employee_impact'] ?? false)) {
+                return response()->json([
+                    'message' => 'برای این روز برنامه حضور کارکنان ثبت شده است. برای تعطیل‌کردن روز، تغییر را تأیید کنید.',
+                    'code' => 'employee_schedule_conflict',
+                    'employees' => $affectedDays->map(fn ($day) => [
+                        'membership_id' => $day->membership->id,
+                        'name' => $day->membership->user->name,
+                    ])->values(),
+                ], 409);
+            }
+        }
+
+        $day = DB::transaction(function () use ($salon, $date, $data, $affectedDays) {
+            $day = $salon->workingDays()->updateOrCreate(
                 ['date' => $date],
                 [
                     'is_open' => $data['is_open'],
@@ -75,10 +102,21 @@ class AppointmentScheduleController extends Controller
                         'sort_order' => $index,
                     ]);
                 }
+            } else {
+                foreach ($affectedDays as $employeeDay) {
+                    $employeeDay->periods()->delete();
+                    $employeeDay->update(['is_present' => false]);
+                }
             }
 
             return $day;
         });
+
+        if (! $data['is_open']) {
+            foreach ($affectedDays as $employeeDay) {
+                $employeeDay->membership->user->notify(new WorkDayCancelled($salon->id, $salon->name, $date));
+            }
+        }
 
         return response()->json(['data' => $this->dayData($day->load('periods'))]);
     }
@@ -98,6 +136,11 @@ class AppointmentScheduleController extends Controller
             'planning_period' => $settings->planning_period,
             'is_recurring' => $settings->is_recurring,
             'timezone' => $settings->timezone,
+            'slot_interval_minutes' => $settings->slot_interval_minutes,
+            'cancellation_notice_hours' => $settings->cancellation_notice_hours,
+            'deposit_enabled' => $settings->deposit_enabled,
+            'deposit_type' => $settings->deposit_type,
+            'deposit_value' => $settings->deposit_value,
         ];
     }
 

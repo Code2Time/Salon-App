@@ -8,5 +8,5 @@ export interface EmployeeScheduleDay {
     is_present: boolean;
     periods: WorkingPeriod[];
 }
-export interface EmployeeOption { membership_id: number; name: string; }
+export interface EmployeeOption { membership_id: number; name: string; image_url: string | null; }
 export interface EmployeeSchedule { employee: EmployeeOption; planning_period: "weekly" | "monthly"; days: EmployeeScheduleDay[]; }

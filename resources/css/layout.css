@@ -584,6 +584,46 @@ main:focus {
     align-items: center;
     justify-content: center;
 }
+.notification-preview-date {
+    color: var(--ara-muted);
+    font-size: 10px;
+}
+.notification-page-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+.notification-list {
+    display: grid;
+    gap: 12px;
+}
+.notification-card {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+}
+.notification-card.unread {
+    border-color: rgba(208, 59, 119, .34);
+    box-shadow: 0 10px 28px rgba(137, 23, 68, .07);
+}
+.notification-card-title,
+.notification-card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.notification-card-title > div {
+    display: grid;
+    gap: 4px;
+}
+.notification-card-title small {
+    color: var(--ara-muted);
+}
+.notification-card-actions {
+    justify-content: flex-end;
+}
 .users-empty {
     flex-direction: column;
     gap: 12px;
@@ -747,6 +787,11 @@ main:focus {
     height: 100%;
     object-fit: cover;
 }
+.category-cover.is-default > img {
+    width: 106px;
+    height: 106px;
+    object-fit: contain;
+}
 .category-badges {
     position: absolute;
     top: 10px;
@@ -838,6 +883,11 @@ main:focus {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+.category-image-preview.is-default img {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
 }
 .category-image-field > div:last-child {
     display: grid;
@@ -1502,6 +1552,15 @@ main:focus {
     font-size: 14px;
 }
 .employee-schedule-page { display: grid; gap: 20px; }
+.employee-picker { display: grid; gap: 16px; padding: 18px; border-radius: 18px; }
+.employee-picker-heading { display: grid; gap: 4px; }
+.employee-picker-heading h3 { font-size: 16px; }
+.employee-avatar-list { display: flex; flex-wrap: wrap; gap: 12px; }
+.employee-avatar-list button { min-width: 150px; display: grid; justify-items: center; gap: 8px; padding: 14px; color: var(--ara-text); font: inherit; background: #fff; border: 1px solid var(--ara-border); border-radius: 16px; cursor: pointer; transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease; }
+.employee-avatar-list button:hover { transform: translateY(-2px); border-color: #d99ab3; box-shadow: 0 10px 24px rgba(137, 23, 68, .08); }
+.employee-avatar-list button.selected { border-color: var(--ara-primary); background: #fff6f9; box-shadow: 0 0 0 2px rgba(208, 59, 119, .1); }
+.employee-avatar-list .MuiAvatar-root { width: 62px; height: 62px; }
+.employee-avatar-list button > span:not(.MuiChip-root) { font-weight: 600; }
 .employee-schedule-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px; border-radius: 18px; }
 .employee-schedule-toolbar .MuiFormControl-root { min-width: 220px; }
 .employee-week-navigation { display: flex; align-items: center; gap: 10px; }
@@ -1513,12 +1572,34 @@ main:focus {
 .employee-day-card b { display: inline-flex; align-items: center; gap: 4px; padding: 6px 8px; color: var(--ara-primary-deep); background: #fff1f6; border-radius: 8px; font-size: 10px; }
 .employee-day-card.present { border-color: rgba(208, 59, 119, .35); box-shadow: inset 0 3px 0 #d64f86; }
 .employee-day-card:disabled { cursor: not-allowed; opacity: .62; background: #f4f0f2; }
+.booking-page { display: grid; gap: 20px; }
+.booking-layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, .75fr); gap: 18px; align-items: start; }
+.booking-form, .booking-summary { display: grid; gap: 16px; padding: 20px; border-radius: 20px; }
+.booking-summary { position: sticky; top: 100px; }
+.booking-items-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.booking-item-row { min-width: 0; display: grid; grid-template-columns: 30px minmax(0, 1fr) minmax(0, 1fr) 40px; gap: 10px; align-items: center; padding: 12px; border: 1px solid var(--ara-border); border-radius: 14px; background: #fffafb; }
+.booking-item-row > span { width: 28px; height: 28px; display: grid; place-items: center; color: #fff; background: var(--ara-primary); border-radius: 50%; font-weight: 700; }
+.booking-item-row .MuiFormControl-root { min-width: 0; }
+.booking-slots { display: flex; flex-wrap: wrap; gap: 8px; max-height: 260px; overflow-y: auto; }
+.booking-total { display: flex; justify-content: space-between; gap: 12px; padding-top: 14px; border-top: 1px solid var(--ara-border); }
+.customer-appointment-list, .panel-appointment-list { display: grid; gap: 14px; }
+.customer-appointment-card, .panel-appointment-card { display: grid; gap: 14px; padding: 18px; border-radius: 18px; }
+.customer-appointment-card > div:first-child, .panel-appointment-card > div:first-child { display: flex; align-items: center; gap: 12px; }
+.customer-appointment-card > div:first-child > span, .panel-appointment-card > div:first-child > span { display: grid; gap: 4px; margin-inline-end: auto; }
+.customer-appointment-card small, .panel-appointment-card small { color: var(--ara-muted); }
+.customer-appointment-card > div:nth-child(2) { display: flex; flex-wrap: wrap; gap: 7px; }
+.customer-appointment-card > div:nth-child(2) span { padding: 7px 10px; background: #fff2f6; border-radius: 9px; font-size: 11px; }
+.panel-appointment-card > div:last-child { display: flex; flex-wrap: wrap; gap: 7px; }
+.panel-booking-dialog.MuiDialogContent-root { display: grid; gap: 15px; padding-top: 10px !important; overflow-x: hidden; }
+.appointment-filters { display: grid; grid-template-columns: minmax(210px, 1fr) minmax(180px, .7fr) auto; align-items: center; gap: 12px; padding: 14px; margin-bottom: 18px; border-radius: 16px; }
 
 @media (max-width: 1100px) {
     .schedule-day-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .schedule-toolbar { flex-wrap: wrap; }
     .schedule-jump { width: 100%; order: 3; }
     .employee-day-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .booking-layout { grid-template-columns: 1fr; }
+    .booking-summary { position: static; }
 }
 @media (max-width: 700px) {
     .appointment-heading { align-items: flex-start; gap: 14px; }
@@ -1540,6 +1621,10 @@ main:focus {
     .employee-week-navigation { justify-content: space-between; }
     .employee-week-navigation strong { font-size: 10px; text-align: center; }
     .employee-day-grid { grid-template-columns: 1fr; }
+    .appointment-filters { grid-template-columns: 1fr; }
+    .booking-item-row { grid-template-columns: 30px minmax(0, 1fr) 38px; }
+    .booking-item-row .MuiFormControl-root:nth-of-type(2) { grid-column: 2; }
+    .booking-item-row > .MuiIconButton-root { grid-column: 3; grid-row: 1 / span 2; }
 }
 
 .customer-shell {
@@ -1817,6 +1902,7 @@ main:focus {
 .customer-service-visual.has-image::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(39, 17, 27, .03), rgba(44, 18, 29, .68)); }
 .customer-service-visual span { position: relative; z-index: 1; padding: 6px 10px; color: #71304a; border-radius: 999px; background: rgba(255,255,255,.86); backdrop-filter: blur(7px); font-size: 9px; font-weight: 700; }
 .customer-service-visual.has-image span { color: #fff; background: rgba(59, 27, 40, .55); }
+.customer-service-default-logo { position: absolute; top: 50%; left: 50%; width: 92px; height: 92px; object-fit: contain; transform: translate(-50%, -50%); }
 .customer-service-copy { position: relative; z-index: 1; min-height: 0; padding: 20px 22px 0; }
 .customer-service-title { display: flex; align-items: flex-start; justify-content: space-between; min-height: 64px; margin-bottom: 12px; color: #a33c65; }
 .customer-service-title > div { display: grid; gap: 5px; }
@@ -1833,6 +1919,7 @@ main:focus {
 .customer-service-dialog-hero { position: relative; min-height: 210px; display: flex; align-items: flex-end; overflow: hidden; padding: 28px; color: #5f263e; background: linear-gradient(135deg, #f5cadb, #fae5cb); background-position: center; background-size: cover; }
 .customer-service-dialog-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(45,18,29,.04), rgba(46,19,30,.24)); }
 .customer-service-dialog-hero.has-image::after { background: linear-gradient(180deg, rgba(24,12,17,.06), rgba(35,15,24,.84)); }
+.customer-service-dialog-hero > .customer-service-default-logo { width: 126px; height: 126px; opacity: .72; }
 .customer-service-dialog-hero > .MuiIconButton-root { position: absolute; z-index: 2; top: 16px; inset-inline-end: 16px; color: #632640; background: rgba(255,255,255,.88); backdrop-filter: blur(8px); }
 .customer-service-dialog-heading { position: relative; z-index: 1; display: grid; gap: 7px; }
 .customer-service-dialog-heading > span { width: fit-content; padding: 5px 9px; color: #73304a; border-radius: 999px; background: rgba(255,255,255,.78); font-size: 8px; font-weight: 700; }

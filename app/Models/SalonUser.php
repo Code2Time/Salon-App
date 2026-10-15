@@ -21,6 +21,24 @@ class SalonUser extends Pivot
         ];
     }
 
+    /**
+     * Return permissions as a normalized list, including legacy double-encoded values.
+     *
+     * @return list<string>
+     */
+    public function permissionNames(): array
+    {
+        $permissions = $this->permissions;
+
+        for ($attempt = 0; $attempt < 2 && is_string($permissions); $attempt++) {
+            $permissions = json_decode($permissions, true);
+        }
+
+        return is_array($permissions)
+            ? array_values(array_filter($permissions, 'is_string'))
+            : [];
+    }
+
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'service_salon_user', 'salon_user_id', 'service_id');

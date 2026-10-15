@@ -6,7 +6,7 @@ export async function fetchAppointmentSchedule(from: string, to: string): Promis
     return data.data;
 }
 
-export async function updateAppointmentSettings(input: { planning_period: PlanningPeriod; is_recurring: boolean }): Promise<AppointmentSettings> {
+export async function updateAppointmentSettings(input: { planning_period: PlanningPeriod; is_recurring: boolean; deposit_enabled?: boolean; deposit_type?: "fixed" | "percentage" | null; deposit_value?: number | null }): Promise<AppointmentSettings> {
     await initializeCsrf();
     const { data } = await api.put<{ data: AppointmentSettings }>("/panel/appointment-schedule/settings", input);
     return data.data;

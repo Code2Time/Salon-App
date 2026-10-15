@@ -1,4 +1,5 @@
 import logoUrl from "../../static/logos/ara-logo.png";
-import defaultAvatarUrl from "../../static/logos/no-avatar.png";
+
+const defaultAvatarUrl = logoUrl;
 
 export { defaultAvatarUrl, logoUrl };
