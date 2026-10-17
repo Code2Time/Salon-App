@@ -16,6 +16,10 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
 
+    protected $attributes = [
+        'is_first_login' => true,
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -31,6 +35,7 @@ class User extends Authenticatable
         'image',
         'system_role',
         'is_active',
+        'is_first_login',
         'email',
         'password',
     ];
@@ -58,6 +63,7 @@ class User extends Authenticatable
             'birth_date' => 'date',
             'system_role' => SystemRole::class,
             'is_active' => 'boolean',
+            'is_first_login' => 'boolean',
             'password' => 'hashed',
         ];
     }

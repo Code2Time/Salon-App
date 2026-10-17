@@ -6,6 +6,7 @@ interface JalaliDatePickerProps {
     value: string;
     onChange: (value: string) => void;
     disableFuture?: boolean;
+    disablePast?: boolean;
 }
 
 function parseGregorianDate(value: string): Date | null {
@@ -37,6 +38,7 @@ export default function JalaliDatePicker({
     value,
     onChange,
     disableFuture = false,
+    disablePast = false,
 }: JalaliDatePickerProps) {
     const [open, setOpen] = useState(false);
     return (
@@ -45,6 +47,7 @@ export default function JalaliDatePicker({
             value={parseGregorianDate(value)}
             onChange={(date) => onChange(toGregorianDateString(date))}
             disableFuture={disableFuture}
+            disablePast={disablePast}
             open={open}
             onOpen={() => setOpen(true)}
             onClose={() => setOpen(false)}

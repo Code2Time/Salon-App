@@ -14,7 +14,7 @@ class EmployeeSeeder extends Seeder
     {
         $salon = Salon::query()->where('slug', 'ara')->firstOrFail();
         $employees = [
-            ['mobile' => '09222222222', 'first_name' => 'کارمند', 'last_name' => 'آزمایشی'],
+            ['mobile' => '09222222222', 'first_name' => 'کارمند', 'last_name' => 'آزمایشی', 'seed_schedule' => true],
             ['mobile' => '09333333333', 'first_name' => 'کارمند دوم', 'last_name' => 'آزمایشی', 'seed_schedule' => true],
         ];
 

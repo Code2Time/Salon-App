@@ -45,6 +45,8 @@ class CurrentUserResource extends JsonResource
             ],
             'home_path' => $panelAccess ? '/panel' : '/app',
             'profile_completed' => filled($this->first_name) && filled($this->last_name),
+            'is_first_login' => $this->is_first_login,
+            'can_test_onboarding' => (bool) config('app.debug'),
         ];
     }
 }

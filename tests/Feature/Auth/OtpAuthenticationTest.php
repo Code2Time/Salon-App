@@ -40,6 +40,7 @@ class OtpAuthenticationTest extends TestCase
             ->assertJsonPath('user.profile_completed', true)
             ->assertJsonPath('user.system_role', null)
             ->assertJsonPath('user.abilities.access_panel', false)
+            ->assertJsonPath('user.is_first_login', true)
             ->assertJsonPath('user.home_path', '/app');
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', ['mobile' => '09123456789', 'system_role' => null]);
@@ -118,6 +119,49 @@ class OtpAuthenticationTest extends TestCase
             ->postJson('/api/auth/otp/request', ['mobile' => '12345'])
             ->assertUnprocessable()
             ->assertJsonValidationErrors('mobile');
+    }
+
+    public function test_authenticated_user_can_complete_first_login_onboarding(): void
+    {
+        $user = User::factory()->create(['is_first_login' => true]);
+
+        $this->actingAs($user)
+            ->postJson('/api/auth/onboarding/complete')
+            ->assertOk()
+            ->assertJsonPath('data.is_first_login', false);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'is_first_login' => false,
+        ]);
+    }
+
+    public function test_guest_cannot_complete_first_login_onboarding(): void
+    {
+        $this->postJson('/api/auth/onboarding/complete')->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_can_toggle_onboarding_state_in_debug_mode(): void
+    {
+        config(['app.debug' => true]);
+        $user = User::factory()->create(['is_first_login' => false]);
+
+        $this->actingAs($user)
+            ->putJson('/api/auth/onboarding/test-state', ['is_first_login' => true])
+            ->assertOk()
+            ->assertJsonPath('data.is_first_login', true)
+            ->assertJsonPath('data.can_test_onboarding', true);
+
+        $this->assertTrue($user->fresh()->is_first_login);
+    }
+
+    public function test_onboarding_test_state_endpoint_is_hidden_outside_debug_mode(): void
+    {
+        config(['app.debug' => false]);
+
+        $this->actingAs(User::factory()->create())
+            ->putJson('/api/auth/onboarding/test-state', ['is_first_login' => false])
+            ->assertNotFound();
     }
 
     private function requestCode(string $mobile): OtpChallenge

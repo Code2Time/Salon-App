@@ -28,6 +28,7 @@
         "@mui/material": "^9.4.0",
         "@mui/stylis-plugin-rtl": "^9.4.0",
         "@mui/x-date-pickers": "^9.15.0",
+        "@sjmc11/tourguidejs": "^0.0.27",
         "date-fns-jalali": "^4.0.0-0",
         "lucide-react": "^1.52.0",
         "react": "^19.3.0",

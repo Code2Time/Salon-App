@@ -22,9 +22,10 @@ import AppointmentSettings from "../pages/panel/AppointmentSettings";
 import EmployeeSchedules from "../pages/panel/EmployeeSchedules";
 import PanelAppointments from "../pages/panel/Appointments";
 import CustomerAppointments from "../pages/customer/Appointments";
+import CustomerBooking from "../pages/customer/Booking";
 import Notifications from "../pages/Notifications";
 
-const protectedCustomerPaths = new Set(["/app/appointments", "/app/profile"]);
+const protectedCustomerPaths = new Set(["/app/booking", "/app/appointments", "/app/profile"]);
 
 export default function AppRoutes() {
     const { pathname } = useLocation();
@@ -36,6 +37,7 @@ export default function AppRoutes() {
             "/preview": "پیش‌نمایش",
             "/panel/notifications": "اعلان‌ها",
             "/app/notifications": "اعلان‌ها",
+            "/app/booking": "رزرو نوبت",
         };
         const current = [...flattenNavigation(panelNavigation), ...customerNavigation].find(
             (item) => item.path === pathname,
@@ -85,10 +87,11 @@ export default function AppRoutes() {
             <Route path="/app" element={<CustomerLayout />}>
                 <Route index element={<Home />} />
                 <Route path="services" element={<CustomerServices />} />
+                <Route path="booking" element={<RouteAccess area="customer"><CustomerBooking /></RouteAccess>} />
                 <Route path="profile" element={<RouteAccess area="customer"><CustomerProfile /></RouteAccess>} />
                 <Route path="appointments" element={<RouteAccess area="customer"><CustomerAppointments /></RouteAccess>} />
                 <Route path="notifications" element={<RouteAccess area="customer"><Notifications /></RouteAccess>} />
-                {customerNavigation.slice(1).filter((item) => !["/app/profile", "/app/services", "/app/appointments"].includes(item.path)).map((item) => (
+                {customerNavigation.slice(1).filter((item) => !["/app/profile", "/app/services", "/app/booking", "/app/appointments"].includes(item.path)).map((item) => (
                     <Route
                         key={item.path}
                         path={item.path.slice("/app/".length)}

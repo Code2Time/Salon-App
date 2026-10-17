@@ -67,6 +67,7 @@ class DatabaseSeeder extends Seeder
             EmployeeSeeder::class,
             ServiceCategorySeeder::class,
             ServiceSeeder::class,
+            AppointmentSeeder::class,
         ]);
     }
 }

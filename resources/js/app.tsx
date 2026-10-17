@@ -17,6 +17,7 @@ import "@fontsource/vazirmatn/500.css";
 import "@fontsource/vazirmatn/600.css";
 import "@fontsource/vazirmatn/700.css";
 import "react-toastify/dist/ReactToastify.css";
+import "@sjmc11/tourguidejs/dist/css/tour.min.css";
 import "../css/layout.css";
 
 const rtlCache = createCache({

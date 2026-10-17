@@ -25,6 +25,8 @@ export interface AuthUser {
     };
     home_path: "/panel" | "/app";
     profile_completed: boolean;
+    is_first_login: boolean;
+    can_test_onboarding: boolean;
 }
 
 export type AuthMode = "login" | "register";

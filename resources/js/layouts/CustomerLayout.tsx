@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { readableApiError } from "../services/api/client";
 import { defaultAvatarUrl } from "../constants/assets";
 import NotificationBell from "../components/layout/NotificationBell";
+import CustomerOnboardingTour from "../components/customer/CustomerOnboardingTour";
 
 export default function CustomerLayout() {
     const { pathname } = useLocation();
@@ -77,7 +78,7 @@ export default function CustomerLayout() {
                 id="main-content"
                 tabIndex={-1}
                 className="customer-main"
-                aria-label={current?.label ?? "صفحه پیدا نشد"}
+                aria-label={current?.label ?? (pathname === "/app/booking" ? "رزرو نوبت" : "صفحه پیدا نشد")}
             >
                 <Outlet />
             </main>
@@ -90,6 +91,7 @@ export default function CustomerLayout() {
                 label="منوی موبایل مشتری"
                 className="customer-bottom-nav"
             />
+            <CustomerOnboardingTour />
         </div>
     );
 }

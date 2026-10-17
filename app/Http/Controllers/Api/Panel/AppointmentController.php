@@ -15,6 +15,7 @@ use App\Services\CurrentSalon;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class AppointmentController extends Controller
@@ -94,6 +95,29 @@ class AppointmentController extends Controller
         $updated->customer->notify(new AppointmentChanged('زمان نوبت شما تغییر کرد', 'زمان یا متخصص یکی از سرویس‌های نوبت شما توسط سالن تغییر کرد.', $updated->id));
 
         return new AppointmentResource($updated);
+    }
+
+    public function destroy(Request $request, Appointment $appointment, CurrentSalon $context): JsonResponse
+    {
+        $salon = $context->get();
+        $isOwner = $request->user()->isSuperAdmin() || $salon->users()
+            ->whereKey($request->user()->id)
+            ->wherePivot('is_active', true)
+            ->wherePivot('role', SalonRole::Owner->value)
+            ->exists();
+        abort_unless($isOwner, 403, 'فقط مدیر سالن اجازه حذف نوبت را دارد.');
+
+        $appointment = $salon->appointments()->whereKey($appointment->id)->with('customer')->firstOrFail();
+        DB::transaction(function () use ($appointment): void {
+            $appointment->customer->notify(new AppointmentChanged(
+                'نوبت شما حذف شد',
+                'نوبت شما توسط مدیر سالن از فهرست نوبت‌ها حذف شد.',
+                $appointment->id,
+            ));
+            $appointment->delete();
+        });
+
+        return response()->json(['message' => 'نوبت حذف شد.']);
     }
 
     private function data(Request $request, bool $withStart, bool $withCustomer = false): array

@@ -25,6 +25,8 @@ Route::prefix('auth')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [SessionController::class, 'user']);
+        Route::post('/onboarding/complete', [SessionController::class, 'completeOnboarding']);
+        Route::put('/onboarding/test-state', [SessionController::class, 'updateOnboardingForTesting']);
         Route::post('/logout', [SessionController::class, 'destroy']);
     });
 });
@@ -77,6 +79,7 @@ Route::middleware(['auth:sanctum', 'panel', 'salon', 'appointments'])->prefix('/
     Route::get('/{appointment}', [AppointmentController::class, 'show']);
     Route::put('/{appointment}/status', [AppointmentController::class, 'status']);
     Route::put('/{appointment}/reschedule', [AppointmentController::class, 'reschedule']);
+    Route::delete('/{appointment}', [AppointmentController::class, 'destroy']);
 });
 
 Route::middleware(['auth:sanctum', 'panel', 'salon', 'appointment-settings'])

@@ -31,6 +31,18 @@ export async function fetchCurrentUser(): Promise<AuthUser> {
     return data.data;
 }
 
+export async function completeOnboarding(): Promise<AuthUser> {
+    await initializeCsrf();
+    const { data } = await api.post<UserResponse>("/auth/onboarding/complete");
+    return data.data;
+}
+
+export async function updateOnboardingTestState(isFirstLogin: boolean): Promise<AuthUser> {
+    await initializeCsrf();
+    const { data } = await api.put<UserResponse>("/auth/onboarding/test-state", { is_first_login: isFirstLogin });
+    return data.data;
+}
+
 export async function logout(): Promise<void> {
     await api.post("/auth/logout");
 }

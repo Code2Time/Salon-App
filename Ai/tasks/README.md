@@ -17,6 +17,7 @@
 | 03c | [03c-booking-availability.md](03c-booking-availability.md) | موتور زمان آزاد و رزرو امن | 03a و 03b |
 | 04 | [04-payments.md](04-payments.md) | پیش‌پرداخت و سوابق پرداخت | 03 |
 | 05 | [05-customer-app.md](05-customer-app.md) | تجربهٔ مشتری | 03 و بخش لازم 04 |
+| 05a | [05a-customer-booking-flow.md](05a-customer-booking-flow.md) | انتخاب خدمت و متخصص و ثبت نوبت در APP مشتری | 03c و کاتالوگ خدمات 05 |
 | 06 | [06-advanced-features.md](06-advanced-features.md) | قابلیت‌های توسعه‌ای انتخاب‌شده | پیش‌نیاز زیرکار منتخب |
 
 فازهای 01 تا 05 بستهٔ کاری اولیه دارند؛ تصمیم‌های باز ابتدای اجرای هر فاز حل و ثبت می‌شوند. فاز 06 مجموعهٔ امکانات آینده است و باید ابتدا به task محدود تبدیل شود.

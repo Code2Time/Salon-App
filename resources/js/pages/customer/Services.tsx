@@ -1,6 +1,7 @@
 import { Alert, Avatar, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, IconButton, Paper, Typography } from "@mui/material";
 import { ArrowLeft, Clock3, Sparkles, UserRound, WalletCards, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { defaultAvatarUrl, logoUrl } from "../../constants/assets";
 import { readableApiError } from "../../services/api/client";
 import { fetchCustomerServices } from "../../services/api/customerServices";
@@ -9,6 +10,7 @@ import type { CustomerService } from "../../types/customerService";
 const numberFormat = new Intl.NumberFormat("fa-IR");
 
 export default function CustomerServices() {
+    const navigate = useNavigate();
     const [services, setServices] = useState<CustomerService[]>([]);
     const [salonName, setSalonName] = useState("سالن آرا");
     const [selected, setSelected] = useState<CustomerService | null>(null);
@@ -99,7 +101,7 @@ export default function CustomerServices() {
                         {selected?.providers.length ? <div className="customer-service-provider-grid">{selected.providers.map((provider) => <div key={provider.name}><Avatar src={provider.image_url || defaultAvatarUrl} alt={provider.name} /><span>{provider.name}</span></div>)}</div> : <Typography variant="body2" color="text.secondary">متخصص مناسب هنگام رزرو مشخص می‌شود.</Typography>}
                     </div>
                 </DialogContent>
-                <DialogActions><Typography variant="body2">رزرو آنلاین فعلاً از اپ مشتری در دسترس نیست.</Typography><Button variant="contained" onClick={() => setSelected(null)}>بستن</Button></DialogActions>
+                <DialogActions><Typography variant="body2">متخصص و زمان مناسب را در مرحله بعد انتخاب کنید.</Typography><Button variant="contained" disabled={!selected?.providers.length} onClick={() => selected && navigate(`/app/booking?service=${selected.id}`)}>انتخاب متخصص و رزرو</Button></DialogActions>
             </Dialog>
         </section>
     );

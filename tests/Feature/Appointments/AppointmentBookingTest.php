@@ -83,6 +83,29 @@ class AppointmentBookingTest extends TestCase
         ])->assertCreated()->assertJsonPath('data.required_deposit_amount', 75000);
     }
 
+    public function test_only_owner_can_delete_appointment_and_release_reserved_time(): void
+    {
+        [$salon, $customer, $items, $date, $owner] = $this->bookingFixture();
+        $appointment = $this->actingAs($customer)->postJson('/api/appointments', [
+            'date' => $date, 'starts_at' => '09:00', 'items' => $items,
+        ])->json('data');
+        $employee = $salon->users()->wherePivot('role', SalonRole::Employee->value)->firstOrFail();
+
+        $this->actingAs($employee)
+            ->deleteJson("/api/panel/appointments/{$appointment['id']}")
+            ->assertForbidden();
+
+        $this->actingAs($owner)
+            ->deleteJson("/api/panel/appointments/{$appointment['id']}")
+            ->assertOk()
+            ->assertJsonPath('message', 'نوبت حذف شد.');
+
+        $this->assertDatabaseMissing('appointments', ['id' => $appointment['id']]);
+        $this->assertDatabaseCount('appointment_items', 0);
+        $this->assertDatabaseCount('appointment_reservation_slots', 0);
+        $this->assertDatabaseHas('notifications', ['notifiable_id' => $customer->id]);
+    }
+
     private function bookingFixture(?string $date = null): array
     {
         $date ??= now('Asia/Tehran')->addDays(3)->format('Y-m-d');
