@@ -25,8 +25,10 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
     const [code, setCode] = useState("");
     const [step, setStep] = useState<"details" | "code">("details");
     const [loading, setLoading] = useState(false);
+    const destinationFor = (authenticated: typeof user) =>
+        authenticated?.abilities.access_panel ? "/panel" : returnTo ?? authenticated?.home_path ?? "/app";
 
-    if (!authLoading && user) return <Navigate to={returnTo ?? user.home_path} replace />;
+    if (!authLoading && user) return <Navigate to={destinationFor(user)} replace />;
 
     async function submit(event: FormEvent) {
         event.preventDefault();
@@ -46,7 +48,7 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
                 });
                 setAuthenticatedUser(authenticated);
                 toast.success(mode === "register" ? fa.auth.registrationSucceeded : fa.auth.loginSucceeded);
-                navigate(returnTo ?? authenticated.home_path, { replace: true });
+                navigate(destinationFor(authenticated), { replace: true });
             }
         } catch (caught) {
             toast.error(readableApiError(caught));

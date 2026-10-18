@@ -10,9 +10,10 @@ enum AppointmentStatus: string
     case Cancelled = 'cancelled';
     case NoShow = 'no_show';
     case Rejected = 'rejected';
+    case Expired = 'expired';
 
     public function blocksTime(): bool
     {
-        return ! in_array($this, [self::Cancelled, self::Rejected], true);
+        return ! in_array($this, [self::Cancelled, self::Rejected, self::Expired], true);
     }
 }

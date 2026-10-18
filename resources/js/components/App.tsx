@@ -2,8 +2,10 @@ import { BrowserRouter } from "react-router";
 import AppRoutes from "../routes/AppRoutes";
 import { AuthProvider } from "../auth/AuthContext";
 import { ToastContainer } from "react-toastify";
+import { useColorMode } from "../theme/ColorModeContext";
 
 export default function App() {
+    const { mode } = useColorMode();
     return (
         <BrowserRouter>
             <AuthProvider>
@@ -15,7 +17,7 @@ export default function App() {
                     pauseOnHover
                     newestOnTop
                     rtl
-                    theme="light"
+                    theme={mode}
                     limit={3}
                 />
             </AuthProvider>

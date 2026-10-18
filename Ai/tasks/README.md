@@ -11,6 +11,7 @@
 | 02a | [02a-panel-users.md](02a-panel-users.md) | کاربران پنل، نقش و عضویت سالن | 01 و 01b |
 | 02b | [02b-service-categories.md](02b-service-categories.md) | CRUD دسته‌بندی خدمات و رابطه چندبه‌چند خدمات | 02a |
 | 02c | [02c-service-management.md](02c-service-management.md) | CRUD خدمات، دسته‌بندی‌ها و کارکنان ارائه‌دهنده | 02b |
+| 02d | [02d-salon-dashboard.md](02d-salon-dashboard.md) | داشبورد عملیاتی متکی به آمار واقعی سالن | 02c و 03c |
 | 03 | [03-appointments.md](03-appointments.md) | رزرو، زمان آزاد و تقویم | 02 |
 | 03a | [03a-appointment-settings.md](03a-appointment-settings.md) | منوی بازشونده و تقویم کاری سالن | بخش‌های کاربران و خدمات 02 |
 | 03b | [03b-employee-availability.md](03b-employee-availability.md) | برنامه حضور کارکنان و نظارت مدیر | 03a |

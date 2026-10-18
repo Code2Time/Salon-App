@@ -2,10 +2,13 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\SalonRole;
 use App\Models\ErrorLog;
 use App\Models\OtpChallenge;
+use App\Models\Salon;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class OtpAuthenticationTest extends TestCase
@@ -111,6 +114,53 @@ class OtpAuthenticationTest extends TestCase
 
         $this->withHeaders($this->statefulHeaders)->postJson('/api/auth/logout')->assertOk();
         $this->withHeaders($this->statefulHeaders)->getJson('/api/auth/me')->assertUnauthorized();
+    }
+
+    public function test_salon_owner_login_returns_panel_as_home_path(): void
+    {
+        $owner = User::factory()->create();
+        $salon = Salon::create(['name' => 'آرا', 'slug' => 'ara']);
+        $salon->users()->attach($owner, [
+            'role' => SalonRole::Owner->value,
+            'is_active' => true,
+        ]);
+        $this->requestCode($owner->mobile);
+
+        $this->withHeaders($this->statefulHeaders)->postJson('/api/auth/otp/verify', [
+            'mobile' => $owner->mobile,
+            'code' => '1111',
+            'mode' => 'login',
+        ])->assertOk()
+            ->assertJsonPath('user.abilities.access_panel', true)
+            ->assertJsonPath('user.home_path', '/panel');
+    }
+
+    public function test_user_can_login_from_the_current_lan_host(): void
+    {
+        config(['sanctum.stateful' => [
+            '192.168.100.15:8000',
+            Sanctum::$currentRequestHostPlaceholder,
+        ]]);
+
+        $user = User::factory()->create();
+        $lanHeaders = [
+            'Host' => '192.168.100.15:8000',
+            'Origin' => 'http://192.168.100.15:8000',
+            'Referer' => 'http://192.168.100.15:8000/login',
+            'Accept' => 'application/json',
+        ];
+
+        $this->withHeaders($lanHeaders)
+            ->postJson('/api/auth/otp/request', ['mobile' => $user->mobile])
+            ->assertOk();
+
+        $this->withHeaders($lanHeaders)->postJson('/api/auth/otp/verify', [
+            'mobile' => $user->mobile,
+            'code' => '1111',
+            'mode' => 'login',
+        ])->assertOk();
+
+        $this->assertAuthenticatedAs($user);
     }
 
     public function test_invalid_iranian_mobile_is_rejected(): void

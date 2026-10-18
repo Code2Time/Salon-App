@@ -7,6 +7,13 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Salon App documentation
+
+- [Project guide](Ai/README.md)
+- [Local development](Ai/LocalDevelopment.md)
+- [Ubuntu and mobile access](Ai/UbuntuMobileAccess.md)
+- [Current project status](Ai/ProjectStatus.md)
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

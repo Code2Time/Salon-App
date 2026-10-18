@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CustomerAppointmentController;
 use App\Http\Controllers\Api\CustomerServiceController;
 use App\Http\Controllers\Api\Panel\AppointmentController;
 use App\Http\Controllers\Api\Panel\AppointmentScheduleController;
+use App\Http\Controllers\Api\Panel\DashboardController;
 use App\Http\Controllers\Api\Panel\EmployeeScheduleController;
 use App\Http\Controllers\Api\Panel\NotificationController;
 use App\Http\Controllers\Api\Panel\ProfileController as PanelProfileController;
@@ -45,6 +46,9 @@ Route::middleware('auth:sanctum')->prefix('/appointments')->group(function () {
 Route::get('/panel/context', fn (CurrentSalon $context) => response()->json([
     'data' => ['salon_id' => $context->get()->id, 'salon_name' => $context->get()->name],
 ]))->middleware(['auth:sanctum', 'panel', 'salon']);
+
+Route::get('/panel/dashboard', DashboardController::class)
+    ->middleware(['auth:sanctum', 'panel', 'salon', 'dashboard']);
 
 Route::apiResource('/panel/users', SalonUserController::class)
     ->middleware(['auth:sanctum', 'panel', 'salon', 'manage-salon-users']);

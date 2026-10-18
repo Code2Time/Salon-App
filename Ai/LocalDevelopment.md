@@ -19,7 +19,7 @@ php artisan storage:link
 
 ## اجرا
 
-در دو ترمینال از ریشهٔ پروژه:
+در سه ترمینال از ریشهٔ پروژه:
 
 ```sh
 php artisan serve
@@ -29,7 +29,17 @@ php artisan serve
 npm run dev
 ```
 
+```sh
+php artisan schedule:work
+```
+
+پردازش زمان‌بندی‌شده برای باطل‌کردن نوبت‌های گذشته هر دقیقه اجرا می‌شود. API هنگام خواندن نوبت‌ها نیز وضعیت را همگام می‌کند، اما در محیط عملیاتی Scheduler باید به‌صورت دائمی فعال باشد.
+
 صفحه را از آدرس Laravel که فرمان اول چاپ می‌کند باز کن؛ پورت Vite صفحهٔ اصلی برنامه نیست.
+
+برای تست روی موبایل، سرور را با `php artisan serve --host=0.0.0.0 --port=8000` اجرا و آدرس IP سیستم در شبکهٔ محلی (برای نمونه `http://192.168.100.15:8000`) را باز کن. مقدار `__SANCTUM_CURRENT_REQUEST_HOST__` در `SANCTUM_STATEFUL_DOMAINS` فقط برای محیط توسعه نگه داشته شده تا ورود session-based روی IP محلی و دامنه‌های موقت Tunnel نیز کار کند؛ در production باید دامنه‌های واقعی به‌صورت صریح جایگزین شوند.
+
+دستورهای کامل Ubuntu، تنظیم Firewall، اتصال گوشی و Cloudflare Tunnel در [UbuntuMobileAccess.md](UbuntuMobileAccess.md) ثبت شده‌اند.
 
 | مسیر | محتوا |
 | --- | --- |

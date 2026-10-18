@@ -31,6 +31,7 @@ import { toast } from "react-toastify";
 import { readableApiError } from "../services/api/client";
 import { defaultAvatarUrl } from "../constants/assets";
 import NotificationBell from "../components/layout/NotificationBell";
+import ColorModeToggle from "../components/layout/ColorModeToggle";
 
 const sidebarStateKey = "ara-panel-sidebar-collapsed";
 
@@ -140,6 +141,7 @@ export default function AdminLayout() {
                         <p>همه‌چیز مرتب و در دسترس شماست.</p>
                     </div>
                 </div>
+                <ColorModeToggle />
                 <Button className="sidebar-logout" color="inherit" onClick={handleLogout}>
                     <span>خروج از حساب</span> <ArrowUpLeft size={18} />
                 </Button>

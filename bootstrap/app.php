@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureAppointmentAccess;
 use App\Http\Middleware\EnsureAppointmentSettingsAccess;
+use App\Http\Middleware\EnsureDashboardAccess;
 use App\Http\Middleware\EnsurePanelAccess;
 use App\Http\Middleware\EnsureSalonUsersManagement;
 use App\Http\Middleware\EnsureServiceAccess;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'services' => EnsureServiceAccess::class,
             'appointment-settings' => EnsureAppointmentSettingsAccess::class,
             'appointments' => EnsureAppointmentAccess::class,
+            'dashboard' => EnsureDashboardAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

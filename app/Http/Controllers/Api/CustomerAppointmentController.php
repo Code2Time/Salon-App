@@ -9,6 +9,7 @@ use App\Models\Appointment;
 use App\Models\Salon;
 use App\Services\Appointments\AppointmentAvailability;
 use App\Services\Appointments\BookAppointment;
+use App\Services\Appointments\ExpirePastAppointments;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -34,22 +35,28 @@ class CustomerAppointmentController extends Controller
         return new AppointmentResource($appointment);
     }
 
-    public function index(Request $request)
+    public function index(Request $request, ExpirePastAppointments $expiration)
     {
+        $expiration->handle(customerId: $request->user()->id);
+
         return AppointmentResource::collection(Appointment::query()->where('customer_id', $request->user()->id)
             ->with(['salon.appointmentSetting', 'items.provider.user'])->orderByDesc('starts_at')->paginate(10));
     }
 
-    public function show(Request $request, Appointment $appointment): AppointmentResource
+    public function show(Request $request, Appointment $appointment, ExpirePastAppointments $expiration): AppointmentResource
     {
         abort_unless($appointment->customer_id === $request->user()->id, 404);
+        $expiration->handle(customerId: $request->user()->id);
+        $appointment->refresh();
 
         return new AppointmentResource($appointment->load(['salon.appointmentSetting', 'customer', 'items.provider.user']));
     }
 
-    public function cancel(Request $request, Appointment $appointment): JsonResponse
+    public function cancel(Request $request, Appointment $appointment, ExpirePastAppointments $expiration): JsonResponse
     {
         abort_unless($appointment->customer_id === $request->user()->id, 404);
+        $expiration->handle(customerId: $request->user()->id);
+        $appointment->refresh();
         $data = $request->validate(['reason' => ['nullable', 'string', 'max:1000']]);
         abort_unless($appointment->status === AppointmentStatus::Confirmed, 422, 'این نوبت قابل لغو نیست.');
         $hours = $appointment->salon->appointmentSetting?->cancellation_notice_hours ?? 5;

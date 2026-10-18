@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Appointments;
 
+use App\Enums\AppointmentStatus;
 use App\Enums\SalonRole;
 use App\Models\Salon;
 use App\Models\SalonUser;
@@ -104,6 +105,46 @@ class AppointmentBookingTest extends TestCase
         $this->assertDatabaseCount('appointment_items', 0);
         $this->assertDatabaseCount('appointment_reservation_slots', 0);
         $this->assertDatabaseHas('notifications', ['notifiable_id' => $customer->id]);
+    }
+
+    public function test_past_confirmed_and_pending_appointments_are_automatically_expired(): void
+    {
+        CarbonImmutable::setTestNow('2026-10-18 12:00:00');
+        [$salon, $customer] = $this->bookingFixture('2026-10-19');
+        $pastConfirmed = $salon->appointments()->create([
+            'customer_id' => $customer->id,
+            'source' => 'panel',
+            'status' => AppointmentStatus::Confirmed,
+            'starts_at' => now()->subHours(2),
+            'ends_at' => now()->subHour(),
+            'total_price' => 100000,
+            'required_deposit_amount' => 0,
+        ]);
+        $pastPending = $salon->appointments()->create([
+            'customer_id' => $customer->id,
+            'source' => 'customer',
+            'status' => AppointmentStatus::Pending,
+            'starts_at' => now()->subHours(3),
+            'ends_at' => now()->subHours(2),
+            'total_price' => 100000,
+            'required_deposit_amount' => 0,
+        ]);
+        $future = $salon->appointments()->create([
+            'customer_id' => $customer->id,
+            'source' => 'customer',
+            'status' => AppointmentStatus::Confirmed,
+            'starts_at' => now()->addHour(),
+            'ends_at' => now()->addHours(2),
+            'total_price' => 100000,
+            'required_deposit_amount' => 0,
+        ]);
+
+        $this->actingAs($customer)->getJson('/api/appointments')->assertOk();
+
+        $this->assertDatabaseHas('appointments', ['id' => $pastConfirmed->id, 'status' => AppointmentStatus::Expired->value]);
+        $this->assertDatabaseHas('appointments', ['id' => $pastPending->id, 'status' => AppointmentStatus::Expired->value]);
+        $this->assertDatabaseHas('appointments', ['id' => $future->id, 'status' => AppointmentStatus::Confirmed->value]);
+        CarbonImmutable::setTestNow();
     }
 
     private function bookingFixture(?string $date = null): array

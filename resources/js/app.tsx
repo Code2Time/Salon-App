@@ -1,9 +1,8 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider } from "@mui/material/styles";
 import App from "./components/App";
-import theme from "./theme/theme";
+import { ColorModeProvider } from "./theme/ColorModeContext";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 import rtlPlugin from "@mui/stylis-plugin-rtl";
@@ -35,7 +34,7 @@ const root = createRoot(document.getElementById("app")!);
 root.render(
     <React.StrictMode>
         <CacheProvider value={rtlCache}>
-            <ThemeProvider theme={theme}>
+            <ColorModeProvider>
                 <LocalizationProvider
                     dateAdapter={AdapterDateFnsJalali}
                     localeText={persianPickerLocale}
@@ -43,7 +42,7 @@ root.render(
                     <CssBaseline />
                     <App />
                 </LocalizationProvider>
-            </ThemeProvider>
+            </ColorModeProvider>
         </CacheProvider>
     </React.StrictMode>,
 );

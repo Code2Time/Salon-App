@@ -10,6 +10,7 @@ use App\Models\Appointment;
 use App\Notifications\AppointmentChanged;
 use App\Services\Appointments\AppointmentAvailability;
 use App\Services\Appointments\BookAppointment;
+use App\Services\Appointments\ExpirePastAppointments;
 use App\Services\Appointments\RescheduleAppointment;
 use App\Services\CurrentSalon;
 use Carbon\CarbonImmutable;
@@ -35,8 +36,9 @@ class AppointmentController extends Controller
         return response()->json(['data' => ['customers' => $customers, 'services' => $services]]);
     }
 
-    public function index(Request $request, CurrentSalon $context)
+    public function index(Request $request, CurrentSalon $context, ExpirePastAppointments $expiration)
     {
+        $expiration->handle(salonId: $context->get()->id);
         $filters = $request->validate(['date' => ['nullable', 'date_format:Y-m-d'], 'status' => ['nullable', Rule::enum(AppointmentStatus::class)]]);
         $query = $context->get()->appointments()->with(['salon.appointmentSetting', 'customer', 'items.provider.user'])->orderByDesc('starts_at');
         if ($filters['date'] ?? null) {
@@ -66,15 +68,17 @@ class AppointmentController extends Controller
         return new AppointmentResource($booking->create($context->get(), $customer, $request->user(), $data, 'panel'));
     }
 
-    public function show(Appointment $appointment, CurrentSalon $context): AppointmentResource
+    public function show(Appointment $appointment, CurrentSalon $context, ExpirePastAppointments $expiration): AppointmentResource
     {
+        $expiration->handle(salonId: $context->get()->id);
         $appointment = $context->get()->appointments()->whereKey($appointment->id)->firstOrFail();
 
         return new AppointmentResource($appointment->load(['salon.appointmentSetting', 'customer', 'items.provider.user']));
     }
 
-    public function status(Request $request, Appointment $appointment, CurrentSalon $context): AppointmentResource
+    public function status(Request $request, Appointment $appointment, CurrentSalon $context, ExpirePastAppointments $expiration): AppointmentResource
     {
+        $expiration->handle(salonId: $context->get()->id);
         $appointment = $context->get()->appointments()->whereKey($appointment->id)->firstOrFail();
         $data = $request->validate(['status' => ['required', Rule::in(['completed', 'no_show', 'cancelled'])], 'reason' => ['nullable', 'string', 'max:1000']]);
         abort_unless($appointment->status === AppointmentStatus::Confirmed, 422, 'تغییر وضعیت از حالت فعلی مجاز نیست.');
@@ -87,8 +91,9 @@ class AppointmentController extends Controller
         return new AppointmentResource($appointment->load(['salon.appointmentSetting', 'customer', 'items.provider.user']));
     }
 
-    public function reschedule(Request $request, Appointment $appointment, CurrentSalon $context, RescheduleAppointment $service): AppointmentResource
+    public function reschedule(Request $request, Appointment $appointment, CurrentSalon $context, RescheduleAppointment $service, ExpirePastAppointments $expiration): AppointmentResource
     {
+        $expiration->handle(salonId: $context->get()->id);
         $appointment = $context->get()->appointments()->whereKey($appointment->id)->where('status', AppointmentStatus::Confirmed->value)->with(['salon', 'customer'])->firstOrFail();
         $data = $this->data($request, true);
         $updated = $service->handle($appointment, $data);

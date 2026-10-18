@@ -7,7 +7,7 @@ import { cancelMyAppointment, fetchMyAppointments } from "../../services/api/app
 import { readableApiError } from "../../services/api/client";
 import type { Appointment } from "../../types/appointment";
 
-const labels: Record<Appointment["status"], string> = { confirmed: "تأییدشده", completed: "انجام‌شده", cancelled: "لغوشده", no_show: "عدم حضور", pending: "در انتظار", rejected: "ردشده" };
+const labels: Record<Appointment["status"], string> = { confirmed: "تأییدشده", completed: "انجام‌شده", cancelled: "لغوشده", no_show: "عدم حضور", pending: "در انتظار", rejected: "ردشده", expired: "باطل‌شده" };
 const persianDate = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 const faDigits = (value: string) => value.replace(/\d/g, (digit) => "۰۱۲۳۴۵۶۷۸۹"[Number(digit)] ?? digit);
 

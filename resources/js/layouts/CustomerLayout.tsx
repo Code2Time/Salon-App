@@ -11,6 +11,7 @@ import { readableApiError } from "../services/api/client";
 import { defaultAvatarUrl } from "../constants/assets";
 import NotificationBell from "../components/layout/NotificationBell";
 import CustomerOnboardingTour from "../components/customer/CustomerOnboardingTour";
+import ColorModeToggle from "../components/layout/ColorModeToggle";
 
 export default function CustomerLayout() {
     const { pathname } = useLocation();
@@ -34,6 +35,7 @@ export default function CustomerLayout() {
                 <div className="customer-header-inner">
                     <Brand customer />
                     <div className="header-account">
+                        <ColorModeToggle compact />
                         {user?.system_role === "super_admin" && (
                             <Tooltip title="رفتن به پنل مدیریت">
                                 <IconButton component={Link} to="/panel" aria-label="رفتن به پنل مدیریت" className="layout-switch">

@@ -1,27 +1,34 @@
 import { createTheme } from "@mui/material/styles";
+import type { PaletteMode } from "@mui/material";
 
-const theme = createTheme({
-    direction: "rtl",
-    palette: {
-        primary: { main: "#b21e5b", dark: "#78113d", light: "#fce4ee" },
-        secondary: { main: "#b7791f", dark: "#7f4f12", light: "#f8e7c8" },
-        background: { default: "#fff7fa", paper: "#fffdfd" },
-        text: { primary: "#351522", secondary: "#76515f" },
-        divider: "#f0d5df",
-    },
-    typography: {
-        fontFamily: "Vazirmatn, Tahoma, Arial, sans-serif",
-        h1: { fontSize: "2.5rem", fontWeight: 700, lineHeight: 1.6 },
-        h2: { fontSize: "1.65rem", fontWeight: 700, lineHeight: 1.7 },
-        h3: { fontSize: "1.1rem", fontWeight: 600, lineHeight: 1.8 },
-        body1: { lineHeight: 1.9 },
-        body2: { lineHeight: 1.9 },
-        button: { textTransform: "none", fontWeight: 600 },
-    },
-    shape: {
-        borderRadius: 16,
-    },
-    components: {
+export function createAppTheme(mode: PaletteMode) {
+    return createTheme({
+        direction: "rtl",
+        palette: {
+            mode,
+            primary: { main: "#b21e5b", dark: "#78113d", light: "#fce4ee" },
+            secondary: { main: "#b7791f", dark: "#7f4f12", light: "#f8e7c8" },
+            background: mode === "light"
+                ? { default: "#fff7fa", paper: "#fffdfd" }
+                : { default: "#171116", paper: "#241a20" },
+            text: mode === "light"
+                ? { primary: "#351522", secondary: "#76515f" }
+                : { primary: "#fff4f8", secondary: "#cbaeba" },
+            divider: mode === "light" ? "#f0d5df" : "#49343e",
+        },
+        typography: {
+            fontFamily: "Vazirmatn, Tahoma, Arial, sans-serif",
+            h1: { fontSize: "2.5rem", fontWeight: 700, lineHeight: 1.6 },
+            h2: { fontSize: "1.65rem", fontWeight: 700, lineHeight: 1.7 },
+            h3: { fontSize: "1.1rem", fontWeight: 600, lineHeight: 1.8 },
+            body1: { lineHeight: 1.9 },
+            body2: { lineHeight: 1.9 },
+            button: { textTransform: "none", fontWeight: 600 },
+        },
+        shape: {
+            borderRadius: 16,
+        },
+        components: {
         MuiButton: {
             defaultProps: { disableElevation: true },
             styleOverrides: {
@@ -54,7 +61,6 @@ const theme = createTheme({
                 "*": { boxSizing: "border-box" },
             },
         },
-    },
-});
-
-export default theme;
+        },
+    });
+}
