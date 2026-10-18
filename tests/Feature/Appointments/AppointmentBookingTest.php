@@ -45,14 +45,32 @@ class AppointmentBookingTest extends TestCase
     public function test_customer_cancellation_obeys_five_hour_rule_and_releases_slots(): void
     {
         CarbonImmutable::setTestNow('2026-10-15 08:00:00');
-        [, $customer, $items] = $this->bookingFixture('2026-10-16');
+        [$salon, $customer, $items, , $owner] = $this->bookingFixture('2026-10-16');
         $appointment = $this->actingAs($customer)->postJson('/api/appointments', ['date' => '2026-10-16', 'starts_at' => '09:00', 'items' => $items])->json('data');
         $this->actingAs($customer)->postJson("/api/appointments/{$appointment['id']}/cancel", ['reason' => 'تغییر برنامه'])->assertOk();
         $this->assertDatabaseCount('appointment_reservation_slots', 0);
+        $employeeIds = $salon->users()
+            ->wherePivot('role', SalonRole::Employee->value)
+            ->pluck('users.id');
+
+        $this->assertDatabaseCount('notifications', 3);
+        foreach ($employeeIds->push($owner->id) as $recipientId) {
+            $this->assertDatabaseHas('notifications', [
+                'notifiable_type' => User::class,
+                'notifiable_id' => $recipientId,
+            ]);
+        }
+        $notification = $owner->notifications()->sole();
+        $this->assertSame('لغو نوبت توسط مشتری', $notification->data['title']);
+        $this->assertSame('/panel/appointments', $notification->data['path']);
+        $this->assertSame($appointment['id'], $notification->data['appointment_id']);
+        $this->assertStringContainsString('تغییر برنامه', $notification->data['message']);
+        $this->assertDatabaseMissing('notifications', ['notifiable_id' => $customer->id]);
 
         $late = $this->actingAs($customer)->postJson('/api/appointments', ['date' => '2026-10-16', 'starts_at' => '09:00', 'items' => $items])->json('data');
         CarbonImmutable::setTestNow('2026-10-16 06:00:00');
         $this->actingAs($customer)->postJson("/api/appointments/{$late['id']}/cancel")->assertUnprocessable();
+        $this->assertDatabaseCount('notifications', 3);
         CarbonImmutable::setTestNow();
     }
 

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\AppointmentStatus;
+use App\Enums\SalonRole;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AppointmentResource;
 use App\Models\Appointment;
 use App\Models\Salon;
+use App\Notifications\AppointmentCancelledByCustomer;
 use App\Services\Appointments\AppointmentAvailability;
 use App\Services\Appointments\BookAppointment;
 use App\Services\Appointments\ExpirePastAppointments;
@@ -65,6 +67,24 @@ class CustomerAppointmentController extends Controller
         }
         $appointment->update(['status' => AppointmentStatus::Cancelled, 'cancellation_reason' => $data['reason'] ?? null, 'cancelled_by_id' => $request->user()->id, 'cancelled_at' => now()]);
         $appointment->reservationSlots()->delete();
+        $appointment->loadMissing(['customer', 'items.provider.user']);
+
+        $owners = $appointment->salon->users()
+            ->wherePivot('role', SalonRole::Owner->value)
+            ->wherePivot('is_active', true)
+            ->where('users.is_active', true)
+            ->get();
+        $providers = $appointment->items
+            ->map(fn ($item) => $item->provider?->user)
+            ->filter();
+
+        $owners->concat($providers)->unique('id')->each->notify(
+            new AppointmentCancelledByCustomer(
+                $appointment->id,
+                $appointment->customer->name,
+                $appointment->cancellation_reason,
+            ),
+        );
 
         return response()->json(['message' => 'نوبت لغو شد.']);
     }

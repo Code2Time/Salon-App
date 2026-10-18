@@ -97,7 +97,7 @@ export default function CustomerServices() {
                         <div><span className="customer-service-fact-icon"><Clock3 size={20} /></span><span><small>زمان موردنیاز</small><strong>{numberFormat.format(selected?.duration_minutes ?? 0)} دقیقه</strong></span></div>
                     </div>
                     <div className="customer-service-dialog-providers">
-                        <div className="customer-service-dialog-section-title"><span><UserRound size={19} /></span><div><strong>متخصصان این خدمت</strong><small>انتخاب متخصص در مرحله رزرو فعال خواهد شد.</small></div><Chip label="به‌زودی قابل انتخاب" size="small" /></div>
+                        <div className="customer-service-dialog-section-title"><span><UserRound size={19} /></span><div><strong>متخصصان این خدمت</strong><small>انتخاب متخصص در مرحله رزرو فعال خواهد شد.</small></div></div>
                         {selected?.providers.length ? <div className="customer-service-provider-grid">{selected.providers.map((provider) => <div key={provider.name}><Avatar src={provider.image_url || defaultAvatarUrl} alt={provider.name} /><span>{provider.name}</span></div>)}</div> : <Typography variant="body2" color="text.secondary">متخصص مناسب هنگام رزرو مشخص می‌شود.</Typography>}
                     </div>
                 </DialogContent>
