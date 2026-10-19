@@ -64,7 +64,7 @@ export default function AdminLayout() {
     const visibleNavigation = panelNavigation.filter(allowed).map((item) => item.children
         ? { ...item, children: item.children.filter(allowed) }
         : item).filter((item) => !item.children || item.children.length > 0);
-    const current = flattenNavigation(visibleNavigation).find((item) => item.path === pathname) ?? (pathname === "/panel/notifications" ? {
+    const current = flattenNavigation(visibleNavigation).find((item) => item.path === pathname || (item.path === "/panel/orders" && pathname.startsWith("/panel/orders/"))) ?? (pathname === "/panel/notifications" ? {
         path: "/panel/notifications",
         label: "اعلان‌ها",
         description: "پیام‌ها و رویدادهای مهم حساب شما",

@@ -42,6 +42,7 @@ export interface ServiceOptions {
 }
 
 export interface ServiceFilters {
+    per_page?: number;
     search?: string;
     status?: string;
     category_id?: number;

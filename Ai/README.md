@@ -28,4 +28,6 @@
 
 نمونه‌های آماده در [StartPrompts.md](StartPrompts.md) قرار دارند.
 
+راهنمای کد ثابت توسعه و اتصال پیامک در [SmsIrSetup.md](SmsIrSetup.md) قرار دارد.
+
 راهنمای اجرای برنامه و مسیرهای پیش‌نمایش در [LocalDevelopment.md](LocalDevelopment.md) قرار دارد. برای اجرای پروژه روی Ubuntu و اتصال گوشی از شبکه محلی یا Cloudflare Tunnel، [UbuntuMobileAccess.md](UbuntuMobileAccess.md) را بخوان.

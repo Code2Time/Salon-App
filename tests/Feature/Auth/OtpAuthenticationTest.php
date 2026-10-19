@@ -30,7 +30,7 @@ class OtpAuthenticationTest extends TestCase
 
         $response = $this->withHeaders($this->statefulHeaders)->postJson('/api/auth/otp/verify', [
             'mobile' => '+989123456789',
-            'code' => '1111',
+            'code' => '2244',
             'mode' => 'register',
             'first_name' => 'مشتری',
             'last_name' => 'جدید',
@@ -55,7 +55,7 @@ class OtpAuthenticationTest extends TestCase
 
         $this->withHeaders($this->statefulHeaders)->postJson('/api/auth/otp/verify', [
             'mobile' => '09123456789',
-            'code' => '1111',
+            'code' => '2244',
             'mode' => 'register',
             'first_name' => 'کاربر',
             'last_name' => 'جدید',
@@ -84,7 +84,7 @@ class OtpAuthenticationTest extends TestCase
         $this->assertSame('کد ورود صحیح نیست.', $error->message);
         $this->assertStringNotContainsString('2222', $error->message);
 
-        $payload['code'] = '1111';
+        $payload['code'] = '2244';
         $this->withHeaders($this->statefulHeaders)->postJson('/api/auth/otp/verify', $payload)->assertOk();
         $this->withHeaders($this->statefulHeaders)->postJson('/api/auth/logout')->assertOk();
         $this->withHeaders($this->statefulHeaders)->postJson('/api/auth/otp/verify', $payload)
@@ -96,7 +96,7 @@ class OtpAuthenticationTest extends TestCase
         $this->requestCode('09123456789');
 
         $this->withHeaders($this->statefulHeaders)->postJson('/api/auth/otp/verify', [
-            'mobile' => '09123456789', 'code' => '1111', 'mode' => 'login',
+            'mobile' => '09123456789', 'code' => '2244', 'mode' => 'login',
         ])->assertUnprocessable()->assertJsonValidationErrors('mobile');
     }
 
@@ -105,7 +105,7 @@ class OtpAuthenticationTest extends TestCase
         $user = User::factory()->create();
         $this->requestCode($user->mobile);
         $this->withHeaders($this->statefulHeaders)->postJson('/api/auth/otp/verify', [
-            'mobile' => $user->mobile, 'code' => '1111', 'mode' => 'login',
+            'mobile' => $user->mobile, 'code' => '2244', 'mode' => 'login',
         ])->assertOk();
 
         $this->withHeaders($this->statefulHeaders)->getJson('/api/auth/me')
@@ -128,7 +128,7 @@ class OtpAuthenticationTest extends TestCase
 
         $this->withHeaders($this->statefulHeaders)->postJson('/api/auth/otp/verify', [
             'mobile' => $owner->mobile,
-            'code' => '1111',
+            'code' => '2244',
             'mode' => 'login',
         ])->assertOk()
             ->assertJsonPath('user.abilities.access_panel', true)
@@ -156,7 +156,7 @@ class OtpAuthenticationTest extends TestCase
 
         $this->withHeaders($lanHeaders)->postJson('/api/auth/otp/verify', [
             'mobile' => $user->mobile,
-            'code' => '1111',
+            'code' => '2244',
             'mode' => 'login',
         ])->assertOk();
 

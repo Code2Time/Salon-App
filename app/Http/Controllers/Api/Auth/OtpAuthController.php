@@ -21,7 +21,9 @@ class OtpAuthController extends Controller
     public function request(RequestOtpRequest $request, OtpSender $sender): JsonResponse
     {
         $mobile = $request->validated('mobile');
-        $code = (string) config('otp.fixed_code');
+        $code = config('otp.driver') === 'smsir'
+            ? (string) random_int(1000, 9999)
+            : (string) config('otp.fixed_code');
 
         $challenge = DB::transaction(function () use ($mobile, $code, $request) {
             OtpChallenge::query()->where('mobile', $mobile)->whereNull('consumed_at')->delete();

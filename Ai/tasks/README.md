@@ -20,6 +20,9 @@
 | 05 | [05-customer-app.md](05-customer-app.md) | تجربهٔ مشتری | 03 و بخش لازم 04 |
 | 05a | [05a-customer-booking-flow.md](05a-customer-booking-flow.md) | انتخاب خدمت و متخصص و ثبت نوبت در APP مشتری | 03c و کاتالوگ خدمات 05 |
 | 06 | [06-advanced-features.md](06-advanced-features.md) | قابلیت‌های توسعه‌ای انتخاب‌شده | پیش‌نیاز زیرکار منتخب |
+| 06a | [06a-product-management.md](06a-product-management.md) | CRUD محصولات، اتصال چندخدمتی و تنظیم توصیه/تخفیف اختیاری | 02c |
+| 06b | [06b-aftercare-recommendations.md](06b-aftercare-recommendations.md) | پیشنهاد شخصی محصول مراقبتی پس از دریافت خدمت | 06a و 03c و 05 |
+| 06c | [06c-product-orders.md](06c-product-orders.md) | محصولات APP، سفارش بدون درگاه و اعلان/جزئیات برای مدیر | 06a و 01b |
 
 فازهای 01 تا 05 بستهٔ کاری اولیه دارند؛ تصمیم‌های باز ابتدای اجرای هر فاز حل و ثبت می‌شوند. فاز 06 مجموعهٔ امکانات آینده است و باید ابتدا به task محدود تبدیل شود.
 

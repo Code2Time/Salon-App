@@ -3,12 +3,16 @@
 use App\Http\Controllers\Api\Auth\OtpAuthController;
 use App\Http\Controllers\Api\Auth\SessionController;
 use App\Http\Controllers\Api\CustomerAppointmentController;
+use App\Http\Controllers\Api\CustomerProductController;
+use App\Http\Controllers\Api\CustomerProductOrderController;
 use App\Http\Controllers\Api\CustomerServiceController;
 use App\Http\Controllers\Api\Panel\AppointmentController;
 use App\Http\Controllers\Api\Panel\AppointmentScheduleController;
 use App\Http\Controllers\Api\Panel\DashboardController;
 use App\Http\Controllers\Api\Panel\EmployeeScheduleController;
 use App\Http\Controllers\Api\Panel\NotificationController;
+use App\Http\Controllers\Api\Panel\ProductController;
+use App\Http\Controllers\Api\Panel\ProductOrderController;
 use App\Http\Controllers\Api\Panel\ProfileController as PanelProfileController;
 use App\Http\Controllers\Api\Panel\SalonUserController;
 use App\Http\Controllers\Api\Panel\ServiceCategoryController;
@@ -18,6 +22,23 @@ use App\Services\CurrentSalon;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/catalog/services', [CustomerServiceController::class, 'index']);
+Route::get('/catalog/products', [CustomerProductController::class, 'index']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/orders', [CustomerProductOrderController::class, 'index']);
+    Route::post('/orders', [CustomerProductOrderController::class, 'store'])->middleware('throttle:10,1');
+    Route::get('/orders/{order}', [CustomerProductOrderController::class, 'show']);
+});
+Route::middleware(['auth:sanctum', 'panel', 'salon'])->group(function () {
+    Route::get('/panel/products', [ProductController::class, 'index'])->middleware('products');
+    Route::get('/panel/products/options', [ProductController::class, 'options'])->middleware('products:manage');
+    Route::post('/panel/products', [ProductController::class, 'store'])->middleware('products:manage');
+    Route::post('/panel/products/{product}', [ProductController::class, 'update'])->middleware('products:manage');
+    Route::delete('/panel/products/{product}', [ProductController::class, 'destroy'])->middleware('products:manage');
+    Route::get('/panel/orders', [ProductOrderController::class, 'index'])->middleware('products:manage');
+    Route::get('/panel/orders/items/{item}/receipt', [ProductOrderController::class, 'receipt'])->middleware('products:manage');
+    Route::post('/panel/orders/items/{item}/fulfillment', [ProductOrderController::class, 'updateItem'])->middleware('products:manage');
+    Route::get('/panel/orders/{order}', [ProductOrderController::class, 'show'])->middleware('products:manage');
+});
 Route::get('/catalog/service-categories', [CustomerServiceController::class, 'categories']);
 
 Route::prefix('auth')->group(function () {

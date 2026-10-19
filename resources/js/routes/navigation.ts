@@ -6,6 +6,7 @@ import {
     House,
     LayoutDashboard,
     Package,
+    ShoppingBag,
     Scissors,
     Settings,
     Shapes,
@@ -116,7 +117,7 @@ export const panelNavigation: NavigationItem[] = [
     {
         path: "/panel/products",
         label: "محصولات",
-        description: "فضای معرفی محصولات مراقبت و زیبایی",
+        description: "محصولات مراقبتی و پیشنهادهای پس از خدمت",
         icon: Package,
         roles: ["salon_owner", "employee"],
         permission: "products",
@@ -128,6 +129,13 @@ export const panelNavigation: NavigationItem[] = [
         icon: ChartNoAxesCombined,
         roles: ["salon_owner", "employee"],
         permission: "reports",
+    },
+    {
+        path: "/panel/orders",
+        label: "سفارش محصولات",
+        description: "جزئیات سفارش‌های مشتریان و هماهنگی تحویل",
+        icon: ShoppingBag,
+        roles: ["salon_owner"],
     },
     {
         path: "/panel/profile",
@@ -167,6 +175,12 @@ export const customerNavigation: NavigationItem[] = [
         label: "نوبت‌های من",
         description: "قرارهای زیبایی شما، در یک نگاه",
         icon: CalendarDays,
+    },
+    {
+        path: "/app/products",
+        label: "محصولات",
+        description: "انتخاب محصولات مراقبتی و ثبت سفارش",
+        icon: Package,
     },
     {
         path: "/app/profile",

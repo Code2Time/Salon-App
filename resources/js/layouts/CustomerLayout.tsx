@@ -80,7 +80,7 @@ export default function CustomerLayout() {
                 id="main-content"
                 tabIndex={-1}
                 className="customer-main"
-                aria-label={current?.label ?? (pathname === "/app/booking" ? "رزرو نوبت" : "صفحه پیدا نشد")}
+                aria-label={current?.label ?? (pathname.startsWith("/app/orders") ? "سفارش‌های من" : pathname === "/app/booking" ? "رزرو نوبت" : "صفحه پیدا نشد")}
             >
                 <Outlet />
             </main>

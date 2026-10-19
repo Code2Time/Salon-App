@@ -116,7 +116,7 @@ cloudflared tunnel --url http://127.0.0.1:8000 \
 
 - Quick Tunnel مخصوص توسعه است و تضمین پایداری ندارد.
 - هر فردی که لینک بدون محدودیت را داشته باشد می‌تواند برنامه را ببیند.
-- این پروژه در محیط توسعه OTP ثابت `1111` و حساب‌های Seed دارد؛ دیتابیس واقعی یا Seed را با Tunnel عمومی بدون `--allowed-mail` منتشر نکن.
+- این پروژه در محیط توسعه OTP ثابت `2244` و حساب‌های Seed دارد؛ دیتابیس واقعی یا Seed را با Tunnel عمومی بدون `--allowed-mail` منتشر نکن.
 - مقدار `__SANCTUM_CURRENT_REQUEST_HOST__` فقط برای توسعه و دامنه‌های موقت است. در Production آن را حذف و دامنه واقعی را صریحاً در `SANCTUM_STATEFUL_DOMAINS` ثبت کن.
 - برای آدرس ثابت و استفاده دائمی، به‌جای Quick Tunnel یک Tunnel مدیریت‌شده با دامنه خودت بساز: [راه‌اندازی Cloudflare Tunnel](https://developers.cloudflare.com/tunnel/get-started/).
 

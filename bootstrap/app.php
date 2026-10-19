@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureAppointmentAccess;
 use App\Http\Middleware\EnsureAppointmentSettingsAccess;
 use App\Http\Middleware\EnsureDashboardAccess;
 use App\Http\Middleware\EnsurePanelAccess;
+use App\Http\Middleware\EnsureProductAccess;
 use App\Http\Middleware\EnsureSalonUsersManagement;
 use App\Http\Middleware\EnsureServiceAccess;
 use App\Http\Middleware\EnsureServiceCategoryAccess;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'panel' => EnsurePanelAccess::class,
+            'products' => EnsureProductAccess::class,
             'salon' => ResolveSalonContext::class,
             'manage-salon-users' => EnsureSalonUsersManagement::class,
             'service-categories' => EnsureServiceCategoryAccess::class,
