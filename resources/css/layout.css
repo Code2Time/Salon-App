@@ -2355,7 +2355,9 @@ main:focus {
 .appointments-filter-title strong { color: #563041; font-size: 11px; }
 .appointments-filter-title small { color: var(--ara-muted); font-size: 8px; }
 .appointments-filter-title > .MuiButton-root { margin-inline-start: auto; }
-.appointments-filter-controls { display: grid; grid-template-columns: minmax(220px, .42fr) minmax(0, 1fr); align-items: center; gap: 14px; }
+.appointments-filter-controls { display: grid; grid-template-columns: minmax(300px, .48fr) minmax(0, 1fr); align-items: center; gap: 14px; }
+.appointments-date-navigation { display: grid; grid-template-columns: 36px minmax(0, 1fr) 36px; align-items: center; gap: 6px; min-width: 0; }
+.appointments-date-navigation > .MuiIconButton-root { width: 36px; height: 40px; color: var(--ara-primary); border: 1px solid var(--ara-border); border-radius: 10px; }
 .appointments-status-filter { min-width: 0; display: flex; gap: 7px; overflow-x: auto; padding: 3px; scrollbar-width: thin; }
 .appointments-status-filter button { min-width: max-content; padding: 9px 13px; color: #866b76; font: 600 9px "Vazirmatn", sans-serif; border: 1px solid #eadde2; border-radius: 11px; background: #fff; cursor: pointer; transition: color 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease; }
 .appointments-status-filter button:hover { color: #9e315c; border-color: #dca8bc; }

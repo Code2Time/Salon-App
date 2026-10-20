@@ -83,6 +83,7 @@ class CustomerAppointmentController extends Controller
                 $appointment->id,
                 $appointment->customer->name,
                 $appointment->cancellation_reason,
+                $appointment->salon_id,
             ),
         );
 

@@ -13,6 +13,7 @@ class AppointmentCancelledByCustomer extends Notification
         private readonly int $appointmentId,
         private readonly string $customerName,
         private readonly ?string $reason,
+        private readonly int $salonId,
     ) {}
 
     public function via(object $notifiable): array
@@ -29,6 +30,7 @@ class AppointmentCancelledByCustomer extends Notification
         }
 
         return [
+            'salon_id' => $this->salonId,
             'title' => 'لغو نوبت توسط مشتری',
             'message' => $message,
             'path' => '/panel/appointments',

@@ -8,6 +8,8 @@ use App\Models\Salon;
 use App\Models\SalonUser;
 use App\Models\Service;
 use App\Models\User;
+use App\Notifications\AppointmentBooked;
+use App\Notifications\AppointmentCancelledByCustomer;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -28,6 +30,8 @@ class AppointmentBookingTest extends TestCase
         $this->assertDatabaseHas('appointment_items', ['position' => 0, 'service_name' => 'کوتاهی', 'price' => 100000]);
         $this->assertDatabaseHas('appointment_items', ['position' => 1, 'service_name' => 'رنگ', 'price' => 200000]);
         $this->assertDatabaseCount('appointment_reservation_slots', 90);
+        $this->assertDatabaseCount('notifications', 1);
+        $this->assertDatabaseHas('notifications', ['type' => AppointmentBooked::class]);
     }
 
     public function test_occupied_employee_and_invalid_provider_are_rejected(): void
@@ -53,14 +57,14 @@ class AppointmentBookingTest extends TestCase
             ->wherePivot('role', SalonRole::Employee->value)
             ->pluck('users.id');
 
-        $this->assertDatabaseCount('notifications', 3);
+        $this->assertDatabaseCount('notifications', 4);
         foreach ($employeeIds->push($owner->id) as $recipientId) {
             $this->assertDatabaseHas('notifications', [
                 'notifiable_type' => User::class,
                 'notifiable_id' => $recipientId,
             ]);
         }
-        $notification = $owner->notifications()->sole();
+        $notification = $owner->notifications()->where('type', AppointmentCancelledByCustomer::class)->sole();
         $this->assertSame('لغو نوبت توسط مشتری', $notification->data['title']);
         $this->assertSame('/panel/appointments', $notification->data['path']);
         $this->assertSame($appointment['id'], $notification->data['appointment_id']);
@@ -70,7 +74,7 @@ class AppointmentBookingTest extends TestCase
         $late = $this->actingAs($customer)->postJson('/api/appointments', ['date' => '2026-10-16', 'starts_at' => '09:00', 'items' => $items])->json('data');
         CarbonImmutable::setTestNow('2026-10-16 06:00:00');
         $this->actingAs($customer)->postJson("/api/appointments/{$late['id']}/cancel")->assertUnprocessable();
-        $this->assertDatabaseCount('notifications', 3);
+        $this->assertDatabaseCount('notifications', 5);
         CarbonImmutable::setTestNow();
     }
 

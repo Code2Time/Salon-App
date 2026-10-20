@@ -24,6 +24,10 @@
 | 06b | [06b-aftercare-recommendations.md](06b-aftercare-recommendations.md) | پیشنهاد شخصی محصول مراقبتی پس از دریافت خدمت | 06a و 03c و 05 |
 | 06c | [06c-product-orders.md](06c-product-orders.md) | محصولات APP، سفارش بدون درگاه و اعلان/جزئیات برای مدیر | 06a و 01b |
 
+| 06d | [06d-telegram-notifications.md](06d-telegram-notifications.md) | اعلان تلگرام مدیر و اتصال دستی گیرنده | 03c و 06c |
+
+| 06e | [06e-email-notifications.md](06e-email-notifications.md) | اعلان ایمیل مستقل مدیر در کنار تلگرام | 06d و سرویس SMTP |
+
 فازهای 01 تا 05 بستهٔ کاری اولیه دارند؛ تصمیم‌های باز ابتدای اجرای هر فاز حل و ثبت می‌شوند. فاز 06 مجموعهٔ امکانات آینده است و باید ابتدا به task محدود تبدیل شود.
 
 برای کار جدید از [_template.md](_template.md) کپی بگیر و نامی مانند `07-feature-name.md` انتخاب کن. برای شکستن یک فاز بزرگ از نامی مانند `03a-availability.md` استفاده کن و وابستگی‌ها و وضعیت آن را در همین نقشه و `ProjectStatus.md` ثبت کن. صرف خواندن نقشه مجوز اجرای همهٔ فازها نیست.

@@ -55,7 +55,7 @@ class PlaceProductOrder
             $owners = $salon->users()->wherePivot('role', SalonRole::Owner->value)
                 ->wherePivot('is_active', true)->where('users.is_active', true)->get();
             foreach ($owners as $owner) {
-                $owner->notify(new ProductOrderPlaced($order->id, $customer->name));
+                $owner->notify(new ProductOrderPlaced($order->id, $customer->name, $salon->id));
             }
 
             return $order->load('items');

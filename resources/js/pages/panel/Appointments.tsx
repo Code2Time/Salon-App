@@ -1,6 +1,6 @@
 import { Alert, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, IconButton, InputLabel, MenuItem, Pagination, Paper, Select, Typography } from "@mui/material";
-import { Banknote, CalendarClock, CalendarDays, CalendarPlus, Check, Clock3, Pencil, Plus, RotateCcw, Scissors, SlidersHorizontal, Smartphone, Store, Trash2, UserRound, UserX, X } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Banknote, CalendarClock, CalendarDays, CalendarPlus, Check, ChevronLeft, ChevronRight, Clock3, Pencil, Plus, RotateCcw, Scissors, SlidersHorizontal, Smartphone, Store, Trash2, UserRound, UserX, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../../auth/AuthContext";
 import JalaliDatePicker from "../../components/forms/JalaliDatePicker";
@@ -34,6 +34,7 @@ function dateLabel(value: string): string {
 export default function Appointments() {
     const { user } = useAuth();
     const canDelete = user?.system_role === "super_admin" || user?.memberships.some((membership) => membership.role === "salon_owner");
+    const loadRequest = useRef(0);
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [options, setOptions] = useState<AppointmentOptions>({ customers: [], services: [] });
     const [loading, setLoading] = useState(true);
@@ -55,21 +56,23 @@ export default function Appointments() {
     const [total, setTotal] = useState(0);
 
     const load = useCallback(async () => {
+        const request = ++loadRequest.current;
         setLoading(true);
         try {
             const [result, values] = await Promise.all([
                 fetchPanelAppointments({ ...(filterDate ? { date: filterDate } : {}), ...(filterStatus ? { status: filterStatus } : {}), page }),
                 fetchAppointmentOptions(),
             ]);
+            if (request !== loadRequest.current) return;
             setAppointments(result.data);
             setLastPage(result.meta.last_page);
             setTotal(result.meta.total);
             setOptions(values);
             setError(null);
         } catch (caught) {
-            setError(readableApiError(caught));
+            if (request === loadRequest.current) setError(readableApiError(caught));
         } finally {
-            setLoading(false);
+            if (request === loadRequest.current) setLoading(false);
         }
     }, [filterDate, filterStatus, page]);
 
@@ -133,6 +136,14 @@ export default function Appointments() {
         setDeleteLoading(true);
         try { await deleteAppointment(deleting.id); toast.success("نوبت حذف شد و زمان کارمند آزاد شد."); setDeleting(null); await load(); } catch (caught) { toast.error(readableApiError(caught)); } finally { setDeleteLoading(false); }
     }
+    function changeDay(offset: number) {
+        setFilterDate((current) => {
+            const value = current ? new Date(`${current}T12:00:00`) : new Date();
+            value.setDate(value.getDate() + offset);
+            return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+        });
+        setPage(1);
+    }
     function resetFilters() { setFilterDate(""); setFilterStatus(""); setPage(1); }
 
     return <section className="appointments-page">
@@ -144,7 +155,11 @@ export default function Appointments() {
 
         <Paper variant="outlined" className="appointments-filter-panel">
             <div className="appointments-filter-title"><span><SlidersHorizontal size={18} /></span><div><strong>فیلتر نوبت‌ها</strong><small>نمایش را بر اساس تاریخ یا وضعیت محدود کنید</small></div>{(filterDate || filterStatus) && <Button size="small" color="inherit" onClick={resetFilters}><RotateCcw size={14} /> پاک‌کردن</Button>}</div>
-            <div className="appointments-filter-controls"><JalaliDatePicker label="تاریخ نوبت" value={filterDate} onChange={(value) => { setFilterDate(value); setPage(1); }} /><div className="appointments-status-filter" role="group" aria-label="فیلتر وضعیت">{statusFilters.map((item) => <button key={item.value} type="button" className={filterStatus === item.value ? "active" : ""} onClick={() => { setFilterStatus(item.value); setPage(1); }}>{item.label}</button>)}</div></div>
+            <div className="appointments-filter-controls"><div className="appointments-date-navigation" role="group" aria-label="جابه‌جایی روز نوبت‌ها">
+                <IconButton aria-label="روز قبل" title="روز قبل" onClick={() => changeDay(-1)}><ChevronRight size={20} /></IconButton>
+                <JalaliDatePicker label="تاریخ نوبت" value={filterDate} onChange={(value) => { setFilterDate(value); setPage(1); }} />
+                <IconButton aria-label="روز بعد" title="روز بعد" onClick={() => changeDay(1)}><ChevronLeft size={20} /></IconButton>
+            </div><div className="appointments-status-filter" role="group" aria-label="فیلتر وضعیت">{statusFilters.map((item) => <button key={item.value} type="button" className={filterStatus === item.value ? "active" : ""} onClick={() => { setFilterStatus(item.value); setPage(1); }}>{item.label}</button>)}</div></div>
         </Paper>
 
         {error && <Alert severity="error" action={<Button color="inherit" onClick={() => void load()}>تلاش دوباره</Button>}>{error}</Alert>}

@@ -3,9 +3,11 @@
 namespace App\Services\Appointments;
 
 use App\Enums\AppointmentStatus;
+use App\Enums\SalonRole;
 use App\Models\Appointment;
 use App\Models\Salon;
 use App\Models\User;
+use App\Notifications\AppointmentBooked;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -37,6 +39,14 @@ class BookAppointment
                         $appointment->reservationSlots()->create(['salon_user_id' => $item['provider']->id, 'slot_at' => $slot->utc()]);
                     }
                 }
+
+                $appointment->load(['customer', 'items.provider.user']);
+                $message = $customer->name.' نوبت جدید ثبت کرد. زمان: '
+                    .$appointment->starts_at->setTimezone($settings?->timezone ?? 'Asia/Tehran')->format('Y-m-d H:i')
+                    .'؛ خدمات: '.$appointment->items->pluck('service_name')->implode('، ');
+                $salon->users()->wherePivot('role', SalonRole::Owner->value)
+                    ->wherePivot('is_active', true)->where('users.is_active', true)->get()
+                    ->each->notify(new AppointmentBooked($salon->id, $appointment->id, $message));
 
                 return $appointment->load(['customer', 'items.provider.user']);
             });
