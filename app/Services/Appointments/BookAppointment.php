@@ -44,8 +44,12 @@ class BookAppointment
                 $message = $customer->name.' نوبت جدید ثبت کرد. زمان: '
                     .$appointment->starts_at->setTimezone($settings?->timezone ?? 'Asia/Tehran')->format('Y-m-d H:i')
                     .'؛ خدمات: '.$appointment->items->pluck('service_name')->implode('، ');
-                $salon->users()->wherePivot('role', SalonRole::Owner->value)
-                    ->wherePivot('is_active', true)->where('users.is_active', true)->get()
+                $owners = $salon->users()->wherePivot('role', SalonRole::Owner->value)
+                    ->wherePivot('is_active', true)->where('users.is_active', true)->get();
+                $providers = $salon->users()->wherePivot('role', SalonRole::Employee->value)
+                    ->wherePivotIn('id', $appointment->items->pluck('salon_user_id'))
+                    ->wherePivot('is_active', true)->where('users.is_active', true)->get();
+                $owners->merge($providers)->unique('id')
                     ->each->notify(new AppointmentBooked($salon->id, $appointment->id, $message));
 
                 return $appointment->load(['customer', 'items.provider.user']);

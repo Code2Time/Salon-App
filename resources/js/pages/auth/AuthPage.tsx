@@ -1,6 +1,7 @@
+import { useSalon } from "../../salon/SalonContext";
 import { Button, Paper, TextField, Typography } from "@mui/material";
 import { ArrowLeft, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../../auth/AuthContext";
@@ -12,19 +13,31 @@ import { toast } from "react-toastify";
 import { fa } from "../../locales/fa";
 
 export default function AuthPage({ mode }: { mode: AuthMode }) {
+    const { salon } = useSalon();
     const { user, loading: authLoading, setAuthenticatedUser } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
-    const requestedPath = (location.state as { from?: unknown } | null)?.from;
+    const routeState = location.state as { from?: unknown; mobile?: unknown } | null;
+    const requestedPath = routeState?.from;
     const returnTo = typeof requestedPath === "string" && requestedPath.startsWith("/app/")
         ? requestedPath
         : null;
-    const [mobile, setMobile] = useState("");
+    const [mobile, setMobile] = useState(() =>
+        typeof routeState?.mobile === "string" && /^09\d{9}$/.test(routeState.mobile)
+            ? routeState.mobile
+            : "",
+    );
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [code, setCode] = useState("");
     const [step, setStep] = useState<"details" | "code">("details");
     const [loading, setLoading] = useState(false);
+    const active = useRef(true);
+    const submitting = useRef(false);
+    useEffect(() => {
+        active.current = true;
+        return () => { active.current = false; };
+    }, []);
     const destinationFor = (authenticated: typeof user) =>
         authenticated?.abilities.access_panel ? "/panel" : returnTo ?? authenticated?.home_path ?? "/app";
 
@@ -32,10 +45,13 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
 
     async function submit(event: FormEvent) {
         event.preventDefault();
+        if (submitting.current) return;
+        submitting.current = true;
         setLoading(true);
         try {
             if (step === "details") {
                 await requestOtp(mobile);
+                if (!active.current) return;
                 setStep("code");
                 toast.success(fa.auth.otpSent);
             } else {
@@ -46,14 +62,16 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
                     ...(firstName ? { first_name: firstName } : {}),
                     ...(lastName ? { last_name: lastName } : {}),
                 });
+                if (!active.current) return;
                 setAuthenticatedUser(authenticated);
                 toast.success(mode === "register" ? fa.auth.registrationSucceeded : fa.auth.loginSucceeded);
                 navigate(destinationFor(authenticated), { replace: true });
             }
         } catch (caught) {
-            toast.error(readableApiError(caught));
+            if (active.current) toast.error(readableApiError(caught));
         } finally {
-            setLoading(false);
+            submitting.current = false;
+            if (active.current) setLoading(false);
         }
     }
 
@@ -64,7 +82,7 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
                 <div>
                     <span className="eyebrow">ورود امن با شماره همراه</span>
                     <Typography component="h1" variant="h2">
-                        {mode === "register" ? "ساخت حساب مشتری" : "ورود به آرا"}
+                        {mode === "register" ? "ساخت حساب مشتری" : `ورود به ${salon?.name ?? "سالن"}`}
                     </Typography>
                     <Typography color="text.secondary" className="auth-intro">
                         {mode === "register"
@@ -120,6 +138,7 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
                         <Button
                             type="button"
                             color="inherit"
+                            disabled={loading}
                             onClick={() => { setStep("details"); setCode(""); }}
                         >
                             <RotateCcw size={17} /> اصلاح شماره
@@ -130,7 +149,7 @@ export default function AuthPage({ mode }: { mode: AuthMode }) {
                     {mode === "register" ? "قبلاً حساب ساخته‌اید؟" : "حساب مشتری ندارید؟"}{" "}
                     <Link
                         to={mode === "register" ? "/login" : "/register"}
-                        state={returnTo ? { from: returnTo } : undefined}
+                        state={{ ...(returnTo ? { from: returnTo } : {}), mobile }}
                     >
                         {mode === "register" ? "وارد شوید" : "ثبت‌نام کنید"}
                     </Link>

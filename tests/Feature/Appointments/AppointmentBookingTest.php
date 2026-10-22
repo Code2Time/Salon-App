@@ -30,8 +30,12 @@ class AppointmentBookingTest extends TestCase
         $this->assertDatabaseHas('appointment_items', ['position' => 0, 'service_name' => 'کوتاهی', 'price' => 100000]);
         $this->assertDatabaseHas('appointment_items', ['position' => 1, 'service_name' => 'رنگ', 'price' => 200000]);
         $this->assertDatabaseCount('appointment_reservation_slots', 90);
-        $this->assertDatabaseCount('notifications', 1);
+        $this->assertDatabaseCount('notifications', 3);
         $this->assertDatabaseHas('notifications', ['type' => AppointmentBooked::class]);
+        foreach ($items as $item) {
+            $employee = SalonUser::findOrFail($item['employee_membership_id'])->user;
+            $this->assertSame($booking->json('data.id'), $employee->notifications()->sole()->data['appointment_id']);
+        }
     }
 
     public function test_occupied_employee_and_invalid_provider_are_rejected(): void
@@ -57,7 +61,7 @@ class AppointmentBookingTest extends TestCase
             ->wherePivot('role', SalonRole::Employee->value)
             ->pluck('users.id');
 
-        $this->assertDatabaseCount('notifications', 4);
+        $this->assertDatabaseCount('notifications', 6);
         foreach ($employeeIds->push($owner->id) as $recipientId) {
             $this->assertDatabaseHas('notifications', [
                 'notifiable_type' => User::class,
@@ -74,7 +78,7 @@ class AppointmentBookingTest extends TestCase
         $late = $this->actingAs($customer)->postJson('/api/appointments', ['date' => '2026-10-16', 'starts_at' => '09:00', 'items' => $items])->json('data');
         CarbonImmutable::setTestNow('2026-10-16 06:00:00');
         $this->actingAs($customer)->postJson("/api/appointments/{$late['id']}/cancel")->assertUnprocessable();
-        $this->assertDatabaseCount('notifications', 5);
+        $this->assertDatabaseCount('notifications', 9);
         CarbonImmutable::setTestNow();
     }
 
@@ -167,6 +171,70 @@ class AppointmentBookingTest extends TestCase
         $this->assertDatabaseHas('appointments', ['id' => $pastPending->id, 'status' => AppointmentStatus::Expired->value]);
         $this->assertDatabaseHas('appointments', ['id' => $future->id, 'status' => AppointmentStatus::Confirmed->value]);
         CarbonImmutable::setTestNow();
+    }
+
+    public function test_booking_notifies_only_owner_and_selected_employees_once_for_customer_and_panel(): void
+    {
+        [$salon, $customer, $items, $date, $owner] = $this->bookingFixture();
+        $unrelated = User::factory()->create();
+        $salon->users()->attach($unrelated, ['role' => 'employee', 'permissions' => ['appointments'], 'is_active' => true]);
+        $salon->users()->attach($customer, ['role' => 'customer', 'is_active' => true]);
+        $selected = SalonUser::findOrFail($items[0]['employee_membership_id'])->user;
+        // Two services with the same specialist must generate one notification per booking.
+        $repeated = [$items[0], $items[0]];
+        foreach ([[$customer, '/api/appointments', '09:00'], [$owner, '/api/panel/appointments', '11:00']] as [$actor, $path, $time]) {
+            $response = $this->actingAs($actor)->postJson($path, [
+                'customer_id' => $customer->id, 'date' => $date, 'starts_at' => $time, 'items' => $repeated,
+            ])->assertCreated();
+            foreach ([$owner, $selected] as $recipient) {
+                $notification = $recipient->notifications()->where('type', AppointmentBooked::class)
+                    ->where('data->appointment_id', $response->json('data.id'))->sole();
+                $this->assertSame('/panel/appointments', $notification->data['path']);
+            }
+        }
+        $this->assertDatabaseCount('notifications', 4);
+        $this->assertDatabaseMissing('notifications', ['notifiable_id' => $unrelated->id]);
+        $this->assertDatabaseMissing('notifications', ['notifiable_id' => $customer->id]);
+    }
+
+    public function test_employees_only_see_assigned_bookings_and_cannot_read_or_modify_other_bookings(): void
+    {
+        [$salon, $customer, $items, $date, $owner] = $this->bookingFixture();
+        $ids = [];
+        foreach ([$items, [$items[0]], [$items[1]]] as $index => $bookingItems) {
+            $ids[] = $this->actingAs($customer)->postJson('/api/appointments', [
+                'date' => $date, 'starts_at' => ['09:00', '11:00', '13:00'][$index], 'items' => $bookingItems,
+            ])->assertCreated()->json('data.id');
+        }
+        $employee = SalonUser::findOrFail($items[0]['employee_membership_id'])->user;
+        $salon->users()->updateExistingPivot($employee->id, ['permissions' => ['appointments', 'dashboard']]);
+        // Owning a different salon must not grant broad access in this salon.
+        $other = Salon::create(['name' => 'دیگر', 'slug' => 'other']);
+        $other->users()->attach($employee, ['role' => 'salon_owner', 'is_active' => true]);
+        $this->actingAs($employee)->getJson('/api/panel/appointments')->assertOk()
+            ->assertJsonPath('meta.total', 2)->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.*.id', fn ($visibleIds) => count(array_diff($visibleIds, [$ids[0], $ids[1]])) === 0);
+        $this->getJson('/api/panel/appointments?date='.$date.'&status=confirmed')->assertOk()->assertJsonPath('meta.total', 2);
+        $this->getJson('/api/panel/appointments/options')->assertOk()->assertJsonPath('data.can_view_all', false);
+        $this->getJson('/api/panel/appointments/'.$ids[0])->assertOk();
+        $this->getJson('/api/panel/appointments/'.$ids[2])->assertNotFound();
+        $this->putJson('/api/panel/appointments/'.$ids[2].'/status', ['status' => 'cancelled'])->assertNotFound();
+        $this->putJson('/api/panel/appointments/'.$ids[2].'/reschedule', [
+            'date' => $date, 'starts_at' => '15:00', 'items' => [$items[1]],
+        ])->assertNotFound();
+        $this->getJson('/api/panel/dashboard')->assertOk()->assertJsonCount(2, 'data.upcoming_appointments');
+        $this->withHeader('X-Salon-ID', 999999)->getJson('/api/panel/appointments')->assertForbidden();
+        $this->flushHeaders();
+        $this->assertDatabaseHas('appointments', ['id' => $ids[2], 'status' => 'confirmed']);
+        $unassigned = User::factory()->create();
+        $salon->users()->attach($unassigned, ['role' => 'employee', 'permissions' => ['appointments'], 'is_active' => true]);
+        $this->actingAs($unassigned)->getJson('/api/panel/appointments')->assertOk()->assertJsonPath('meta.total', 0);
+        $this->getJson('/api/panel/appointments/'.$ids[0])->assertNotFound();
+        $this->actingAs($owner)->getJson('/api/panel/appointments')->assertOk()->assertJsonPath('meta.total', 3);
+        $this->getJson('/api/panel/appointments/options')->assertOk()->assertJsonPath('data.can_view_all', true);
+        $superAdmin = User::factory()->create(['system_role' => 'super_admin']);
+        $this->actingAs($superAdmin)->getJson('/api/panel/appointments')->assertOk()->assertJsonPath('meta.total', 3);
+        $this->getJson('/api/panel/appointments/'.$ids[2])->assertOk();
     }
 
     private function bookingFixture(?string $date = null): array

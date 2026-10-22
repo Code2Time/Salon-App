@@ -1,3 +1,4 @@
+import { useSalon } from "../../salon/SalonContext";
 import { Alert, Avatar, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, IconButton, Paper, Typography } from "@mui/material";
 import { ArrowLeft, Clock3, Sparkles, UserRound, WalletCards, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -10,9 +11,11 @@ import type { CustomerService } from "../../types/customerService";
 const numberFormat = new Intl.NumberFormat("fa-IR");
 
 export default function CustomerServices() {
+    const { salon: salonDetails } = useSalon();
+    const salonLogo = salonDetails?.logo_url || logoUrl;
     const navigate = useNavigate();
     const [services, setServices] = useState<CustomerService[]>([]);
-    const [salonName, setSalonName] = useState("سالن آرا");
+    const [salonName, setSalonName] = useState("سالن");
     const [selected, setSelected] = useState<CustomerService | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -56,7 +59,7 @@ export default function CustomerServices() {
                                 style={service.categories[0]?.image_url ? { backgroundImage: `url(${service.categories[0].image_url})` } : undefined}
                             >
                                 <span>{service.categories[0]?.name || "خدمات زیبایی"}</span>
-                                {!service.categories[0]?.image_url && <img className="customer-service-default-logo" src={logoUrl} alt="لوگوی آرا" />}
+                                {!service.categories[0]?.image_url && <img className="customer-service-default-logo" src={salonLogo} alt="لوگوی سالن" />}
                             </div>
                             <div className="customer-service-copy">
                                 <div className="customer-service-title">
@@ -79,7 +82,7 @@ export default function CustomerServices() {
                     className={`customer-service-dialog-hero${selected?.categories[0]?.image_url ? " has-image" : ""}`}
                     style={selected?.categories[0]?.image_url ? { backgroundImage: `url(${selected.categories[0].image_url})` } : undefined}
                 >
-                    {!selected?.categories[0]?.image_url && <img className="customer-service-default-logo" src={logoUrl} alt="لوگوی آرا" />}
+                    {!selected?.categories[0]?.image_url && <img className="customer-service-default-logo" src={salonLogo} alt="لوگوی سالن" />}
                     <IconButton aria-label="بستن" onClick={() => setSelected(null)}><X size={19} /></IconButton>
                     <div className="customer-service-dialog-heading">
                         <span>معرفی خدمت</span>

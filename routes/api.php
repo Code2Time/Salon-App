@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\Api\AftercareRecommendationController;
 use App\Http\Controllers\Api\Auth\OtpAuthController;
 use App\Http\Controllers\Api\Auth\SessionController;
 use App\Http\Controllers\Api\CustomerAppointmentController;
 use App\Http\Controllers\Api\CustomerProductController;
 use App\Http\Controllers\Api\CustomerProductOrderController;
 use App\Http\Controllers\Api\CustomerServiceController;
+use App\Http\Controllers\Api\Panel\AccessLinkController;
 use App\Http\Controllers\Api\Panel\AppointmentController;
 use App\Http\Controllers\Api\Panel\AppointmentScheduleController;
 use App\Http\Controllers\Api\Panel\DashboardController;
@@ -14,16 +16,22 @@ use App\Http\Controllers\Api\Panel\NotificationController;
 use App\Http\Controllers\Api\Panel\ProductController;
 use App\Http\Controllers\Api\Panel\ProductOrderController;
 use App\Http\Controllers\Api\Panel\ProfileController as PanelProfileController;
+use App\Http\Controllers\Api\Panel\SalonSettingsController;
 use App\Http\Controllers\Api\Panel\SalonUserController;
 use App\Http\Controllers\Api\Panel\ServiceCategoryController;
 use App\Http\Controllers\Api\Panel\ServiceController;
 use App\Http\Controllers\Api\ProfileController as CustomerProfileController;
+use App\Http\Controllers\Api\PublicSalonController;
 use App\Services\CurrentSalon;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/catalog/salon', PublicSalonController::class);
 
 Route::get('/catalog/services', [CustomerServiceController::class, 'index']);
 Route::get('/catalog/products', [CustomerProductController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/recommendations', [AftercareRecommendationController::class, 'index']);
+    Route::post('/orders/quote', [CustomerProductOrderController::class, 'quote'])->middleware('throttle:30,1');
     Route::get('/orders', [CustomerProductOrderController::class, 'index']);
     Route::post('/orders', [CustomerProductOrderController::class, 'store'])->middleware('throttle:10,1');
     Route::get('/orders/{order}', [CustomerProductOrderController::class, 'show']);
@@ -70,6 +78,12 @@ Route::get('/panel/context', fn (CurrentSalon $context) => response()->json([
 
 Route::get('/panel/dashboard', DashboardController::class)
     ->middleware(['auth:sanctum', 'panel', 'salon', 'dashboard']);
+
+Route::get('/panel/salon', [SalonSettingsController::class, 'show'])->middleware(['auth:sanctum', 'panel', 'salon']);
+Route::post('/panel/salon', [SalonSettingsController::class, 'update'])->middleware(['auth:sanctum', 'panel', 'salon', 'manage-salon-users']);
+
+Route::get('/panel/access-link', AccessLinkController::class)
+    ->middleware(['auth:sanctum', 'panel', 'salon', 'manage-salon-users']);
 
 Route::apiResource('/panel/users', SalonUserController::class)
     ->middleware(['auth:sanctum', 'panel', 'salon', 'manage-salon-users']);

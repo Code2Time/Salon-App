@@ -81,6 +81,15 @@ class User extends Authenticatable
         return $this->system_role === SystemRole::SuperAdmin;
     }
 
+    public function canViewAllAppointmentsIn(int $salonId): bool
+    {
+        return $this->isSuperAdmin() || $this->salons()
+            ->whereKey($salonId)
+            ->wherePivot('role', SalonRole::Owner->value)
+            ->wherePivot('is_active', true)
+            ->exists();
+    }
+
     public function canAccessPanel(): bool
     {
         return $this->isSuperAdmin() || $this->salons()

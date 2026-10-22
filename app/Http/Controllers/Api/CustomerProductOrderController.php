@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreProductOrderRequest;
 use App\Http\Resources\ProductOrderResource;
 use App\Models\ProductOrder;
 use App\Services\PlaceProductOrder;
@@ -22,19 +23,13 @@ class CustomerProductOrderController extends Controller
         return new ProductOrderResource($order->load('items'));
     }
 
-    public function store(Request $request, PlaceProductOrder $service)
+    public function quote(StoreProductOrderRequest $request, PlaceProductOrder $service)
     {
-        $data = $request->validate([
-            'request_id' => ['required', 'uuid'],
-            'salon_id' => ['required', 'integer'],
-            'notes' => ['nullable', 'string', 'max:1000'],
-            'items' => ['required', 'array', 'min:1', 'max:20'],
-            'items.*' => ['required', 'array:product_id,quantity,expected_unit_price'],
-            'items.*.product_id' => ['required', 'integer', 'distinct'],
-            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:99'],
-            'items.*.expected_unit_price' => ['required', 'integer', 'min:0', 'max:999999999999'],
-        ]);
+        return response()->json(['data' => $service->quote($request->user(), $request->validated())]);
+    }
 
-        return (new ProductOrderResource($service->handle($request->user(), $data)))->response()->setStatusCode(201);
+    public function store(StoreProductOrderRequest $request, PlaceProductOrder $service)
+    {
+        return (new ProductOrderResource($service->handle($request->user(), $request->validated())))->response()->setStatusCode(201);
     }
 }

@@ -18,5 +18,5 @@ export async function updateAppointmentStatus(id: number, status: "completed" | 
 export async function rescheduleAppointment(id: number, input: { date: string; starts_at: string; items: BookingItemInput[] }): Promise<Appointment> { await initializeCsrf(); const { data } = await api.put<{ data: Appointment }>(`/panel/appointments/${id}/reschedule`, input); return data.data; }
 export async function deleteAppointment(id: number): Promise<void> { await initializeCsrf(); await api.delete(`/panel/appointments/${id}`); }
 export interface AppointmentOptionService { id: number; name: string; duration_minutes: number; price: number; providers: Array<{ membership_id: number; name: string }> }
-export interface AppointmentOptions { customers: Array<{ id: number; name: string; mobile: string }>; services: AppointmentOptionService[] }
+export interface AppointmentOptions { can_view_all: boolean; customers: Array<{ id: number; name: string; mobile: string }>; services: AppointmentOptionService[] }
 export async function fetchAppointmentOptions(): Promise<AppointmentOptions> { const { data } = await api.get<{ data: AppointmentOptions }>("/panel/appointments/options"); return data.data; }

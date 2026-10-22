@@ -1,3 +1,4 @@
+import { useSalon } from "../salon/SalonContext";
 import { useState } from "react";
 import {
     Avatar,
@@ -36,6 +37,7 @@ import ColorModeToggle from "../components/layout/ColorModeToggle";
 const sidebarStateKey = "ara-panel-sidebar-collapsed";
 
 export default function AdminLayout() {
+    const { salon } = useSalon();
     const [menuOpen, setMenuOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
         try {
@@ -123,7 +125,7 @@ export default function AdminLayout() {
                 <span className="sidebar-workspace-icon"><Sparkles size={16} /></span>
                 <span>
                     <small>فضای کاری فعال</small>
-                    <strong>سالن زیبایی آرا</strong>
+                    <strong>{salon?.name ?? "سالن زیبایی"}</strong>
                 </span>
             </div>
             <p className="nav-caption">مدیریت سالن</p>
@@ -135,7 +137,7 @@ export default function AdminLayout() {
             />
             <div className="sidebar-bottom">
                 <div className="sidebar-note">
-                    <span>ARA</span>
+                    <span>{salon?.name.trim().slice(0, 1) || "س"}</span>
                     <div>
                         <strong>مرکز کنترل سالن</strong>
                         <p>همه‌چیز مرتب و در دسترس شماست.</p>
@@ -238,7 +240,7 @@ export default function AdminLayout() {
                     <Outlet />
                 </main>
                 <footer className="admin-footer">
-                    <span>آرا؛ همراه روزهای زیبای کاری</span>
+                    <span>{salon?.name ?? "سالن زیبایی"}؛ همراه روزهای زیبای کاری</span>
                     <span>version 0.0.1</span>
                 </footer>
             </div>

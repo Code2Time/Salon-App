@@ -1,0 +1,32 @@
+.aftercare-page { display: grid; gap: 22px; }
+.aftercare-heading { display: grid; gap: 6px; }
+.aftercare-heading p { font-size: 13px; }
+.aftercare-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.aftercare-card.MuiPaper-root { display: flex; flex-direction: column; gap: 17px; padding: 22px; border-color: var(--ara-border); border-radius: 18px; min-width: 0; }
+.aftercare-product-heading { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.aftercare-product-heading > div:nth-child(2) { flex: 1; min-width: 130px; }
+.aftercare-product-heading small { color: var(--ara-muted); font-size: 10px; }
+.aftercare-product-heading h2 { font-size: 16px; margin-block: 3px 7px; }
+.aftercare-product-heading span { font-size: 12px; }
+.aftercare-product-heading strong { font-size: 17px; }
+.aftercare-product-heading del { font-size: 12px; color: var(--ara-muted); margin-inline-end: 6px; }
+.aftercare-product-image { width: 75px; height: 85px; display: grid; place-items: center; overflow: hidden; border-radius: 12px; color: var(--ara-muted); background: var(--ara-blush); }
+.aftercare-product-image img { width: 100%; height: 100%; object-fit: contain; }
+.aftercare-description { font-size: 12px; color: var(--ara-muted); margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.9; }
+.aftercare-instructions { display: grid; gap: 12px; padding: 14px; border-radius: 12px; background: var(--ara-blush); }
+.aftercare-instructions strong { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.aftercare-instructions p { font-size: 12px; margin: 5px 0 0; line-height: 1.9; white-space: pre-wrap; overflow-wrap: anywhere; }
+.aftercare-coupon { display: grid; justify-items: start; gap: 6px; border: 1px dashed var(--ara-border); border-radius: 10px; padding: 12px 14px; }
+.aftercare-coupon > span { font-size: 12px; color: var(--ara-primary); }
+.aftercare-coupon code { font-size: 12px; user-select: all; overflow-wrap: anywhere; max-width: 100%; }
+.aftercare-coupon small { color: var(--ara-muted); font-size: 11px; }
+.aftercare-coupon.is-inactive { opacity: .65; }
+.aftercare-card > .MuiButton-root { margin-top: auto; font-size: 12px; }
+.aftercare-empty, .aftercare-loading { display: grid; justify-items: center; text-align: center; gap: 15px; padding: 35px 20px; }
+.aftercare-empty p { color: var(--ara-muted); font-size: 13px; line-height: 2; }
+.shop-coupon { display: grid; gap: 10px; padding: 14px; border: 1px dashed var(--ara-border); border-radius: 12px; }
+.shop-coupon-entry { display: flex; gap: 8px; align-items: start; }
+.shop-coupon-entry .MuiTextField-root { flex: 1; }
+.shop-coupon-summary { display: flex; justify-content: space-between; gap: 12px; color: var(--ara-muted); font-size: 12px; }
+.order-discount-note { color: #30805e; font-size: 12px; margin-top: 7px; }
+@media (max-width: 650px) { .aftercare-grid { grid-template-columns: minmax(0, 1fr); } .aftercare-card.MuiPaper-root { padding: 18px 15px; } .shop-coupon-entry { flex-wrap: wrap; } }

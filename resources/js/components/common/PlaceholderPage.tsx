@@ -7,7 +7,7 @@ export default function PlaceholderPage({ item }: { item: NavigationItem }) {
     return (
         <section>
             <div className="page-heading">
-                <span className="eyebrow">فضای شما در آرا</span>
+                <span className="eyebrow">فضای مدیریت سالن</span>
                 <Typography variant="h2" component="h1">
                     {item.label}
                 </Typography>

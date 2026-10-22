@@ -39,6 +39,7 @@ export async function fetchCatalogProducts(params: { page?: number; search?: str
 
 export interface PlaceOrderInput {
     request_id: string;
+    discount_code?: string;
     salon_id: number;
     notes: string;
     items: { product_id: number; quantity: number; expected_unit_price: number }[];
@@ -77,5 +78,15 @@ export async function saveOrderItemFulfillment(itemId: number, values: {
     if (values.receipt) form.append("receipt", values.receipt);
     await initializeCsrf();
     const { data } = await api.post<{ data: ProductOrder }>(`/panel/orders/items/${itemId}/fulfillment`, form);
+    return data.data;
+}
+
+export async function fetchRecommendations(page = 1): Promise<{ data: import("../../types/product").AftercareRecommendation[]; meta: { last_page: number; total: number } }> {
+    const { data } = await api.get("/recommendations", { params: { page } });
+    return data;
+}
+export async function quoteOrder(input: PlaceOrderInput): Promise<import("../../types/product").OrderQuote> {
+    await initializeCsrf();
+    const { data } = await api.post("/orders/quote", input);
     return data.data;
 }

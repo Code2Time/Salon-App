@@ -1,3 +1,5 @@
+import { useSalon } from "../salon/SalonContext";
+import SalonSettings from "../pages/panel/SalonSettings";
 import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router";
 import AdminLayout from "../layouts/AdminLayout";
@@ -26,15 +28,19 @@ import EmployeeSchedules from "../pages/panel/EmployeeSchedules";
 import PanelAppointments from "../pages/panel/Appointments";
 import CustomerAppointments from "../pages/customer/Appointments";
 import CustomerBooking from "../pages/customer/Booking";
+import InstallApp from "../pages/customer/InstallApp";
+import Recommendations from "../pages/customer/Recommendations";
 import Notifications from "../pages/Notifications";
+import AccessQrCode from "../pages/panel/AccessQrCode";
 
-const protectedCustomerPaths = new Set(["/app/booking", "/app/appointments", "/app/profile"]);
+const protectedCustomerPaths = new Set(["/app/recommendations", "/app/booking", "/app/appointments", "/app/profile"]);
 
 export default function AppRoutes() {
+    const { salon } = useSalon();
     const { pathname } = useLocation();
     useEffect(() => {
         const publicTitles: Record<string, string> = {
-            "/": "آرا",
+            "/": salon?.name ?? "سالن زیبایی",
             "/login": "ورود",
             "/register": "ثبت‌نام",
             "/preview": "پیش‌نمایش",
@@ -42,18 +48,19 @@ export default function AppRoutes() {
             "/app/notifications": "اعلان‌ها",
             "/app/booking": "رزرو نوبت",
             "/app/orders": "سفارش‌های من",
+            "/app/install": "نصب برنامه",
         };
         const current = [...flattenNavigation(panelNavigation), ...customerNavigation].find(
             (item) => item.path === pathname,
         );
-        document.title = `${current?.label ?? publicTitles[pathname] ?? (/^\/(panel|app)\/orders\/\d+$/.test(pathname) ? "جزئیات سفارش" : "صفحه پیدا نشد")} | آرا`;
+        document.title = `${current?.label ?? publicTitles[pathname] ?? (/^\/(panel|app)\/orders\/\d+$/.test(pathname) ? "جزئیات سفارش" : "صفحه پیدا نشد")} | ${salon?.name ?? "سالن زیبایی"}`;
         window.scrollTo(0, 0);
-    }, [pathname]);
+    }, [pathname, salon?.name]);
     return (
         <Routes>
             <Route path="/" element={<HomeRedirect />} />
-            <Route path="/login" element={<AuthPage mode="login" />} />
-            <Route path="/register" element={<AuthPage mode="register" />} />
+            <Route path="/login" element={<AuthPage key="login" mode="login" />} />
+            <Route path="/register" element={<AuthPage key="register" mode="register" />} />
             <Route path="/preview" element={<Preview />} />
             <Route
                 path="/panel"
@@ -77,8 +84,10 @@ export default function AppRoutes() {
                 <Route path="my-schedule" element={<PanelPageAccess item={flattenNavigation(panelNavigation).find((item) => item.path === "/panel/my-schedule")!}><EmployeeSchedules /></PanelPageAccess>} />
                 <Route path="employee-schedules" element={<PanelPageAccess item={flattenNavigation(panelNavigation).find((item) => item.path === "/panel/employee-schedules")!}><EmployeeSchedules management /></PanelPageAccess>} />
                 <Route path="appointments" element={<PanelPageAccess item={flattenNavigation(panelNavigation).find((item) => item.path === "/panel/appointments")!}><PanelAppointments /></PanelPageAccess>} />
+                <Route path="settings" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/settings")!}><SalonSettings /></PanelPageAccess>} />
+                <Route path="access-qr" element={<PanelPageAccess item={panelNavigation.find((item) => item.path === "/panel/access-qr")!}><AccessQrCode /></PanelPageAccess>} />
                 <Route path="notifications" element={<Notifications />} />
-                {flattenNavigation(panelNavigation).slice(1).filter((item) => !["/panel/users", "/panel/customers", "/panel/employees", "/panel/profile", "/panel/service-categories", "/panel/services", "/panel/products", "/panel/orders", "/panel/appointment-settings", "/panel/my-schedule", "/panel/employee-schedules", "/panel/appointments"].includes(item.path) && !item.children?.length).map((item) => (
+                {flattenNavigation(panelNavigation).slice(1).filter((item) => !["/panel/settings", "/panel/access-qr", "/panel/users", "/panel/customers", "/panel/employees", "/panel/profile", "/panel/service-categories", "/panel/services", "/panel/products", "/panel/orders", "/panel/appointment-settings", "/panel/my-schedule", "/panel/employee-schedules", "/panel/appointments"].includes(item.path) && !item.children?.length).map((item) => (
                     <Route
                         key={item.path}
                         path={item.path.slice("/panel/".length)}
@@ -94,14 +103,16 @@ export default function AppRoutes() {
             <Route path="/app" element={<CustomerLayout />}>
                 <Route index element={<Home />} />
                 <Route path="services" element={<CustomerServices />} />
+                <Route path="install" element={<InstallApp />} />
                 <Route path="products" element={<CustomerProducts />} />
+                <Route path="recommendations" element={<RouteAccess area="customer"><Recommendations /></RouteAccess>} />
                 <Route path="orders" element={<RouteAccess area="customer"><ProductOrders /></RouteAccess>} />
                 <Route path="orders/:orderId" element={<RouteAccess area="customer"><ProductOrders /></RouteAccess>} />
                 <Route path="booking" element={<RouteAccess area="customer"><CustomerBooking /></RouteAccess>} />
                 <Route path="profile" element={<RouteAccess area="customer"><CustomerProfile /></RouteAccess>} />
                 <Route path="appointments" element={<RouteAccess area="customer"><CustomerAppointments /></RouteAccess>} />
                 <Route path="notifications" element={<RouteAccess area="customer"><Notifications /></RouteAccess>} />
-                {customerNavigation.slice(1).filter((item) => !["/app/profile", "/app/services", "/app/products", "/app/booking", "/app/appointments"].includes(item.path)).map((item) => (
+                {customerNavigation.slice(1).filter((item) => !["/app/recommendations", "/app/profile", "/app/services", "/app/products", "/app/booking", "/app/appointments"].includes(item.path)).map((item) => (
                     <Route
                         key={item.path}
                         path={item.path.slice("/app/".length)}

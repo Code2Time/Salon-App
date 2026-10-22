@@ -6,6 +6,8 @@ import {
     House,
     LayoutDashboard,
     Package,
+    QrCode,
+    Sparkles,
     ShoppingBag,
     Scissors,
     Settings,
@@ -138,6 +140,13 @@ export const panelNavigation: NavigationItem[] = [
         roles: ["salon_owner"],
     },
     {
+        path: "/panel/access-qr",
+        label: "QR ورود مشتری",
+        description: "اسکن کد و ورود سریع به برنامه سالن",
+        icon: QrCode,
+        roles: ["salon_owner"],
+    },
+    {
         path: "/panel/profile",
         label: "پروفایل من",
         description: "ویرایش اطلاعات و تصویر حساب کاربری",
@@ -181,6 +190,12 @@ export const customerNavigation: NavigationItem[] = [
         label: "محصولات",
         description: "انتخاب محصولات مراقبتی و ثبت سفارش",
         icon: Package,
+    },
+    {
+        path: "/app/recommendations",
+        label: "پیشنهادها",
+        description: "محصولات مراقبتی و تخفیف‌های مخصوص شما",
+        icon: Sparkles,
     },
     {
         path: "/app/profile",

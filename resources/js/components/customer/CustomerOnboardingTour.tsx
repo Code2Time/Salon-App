@@ -22,8 +22,8 @@ export default function CustomerOnboardingTour() {
         const mobile = window.matchMedia("(max-width: 760px)").matches;
         const tour = new TourGuideClient({
             steps: [
-                { title: "به آرا خوش آمدید ✨", content: "اینجا فضای شخصی شماست؛ خدمات را می‌بینید، متخصص دلخواهتان را انتخاب می‌کنید و نوبت می‌گیرید.", target: document.body },
-                { title: "هویت سالن", content: "با لمس لوگوی آرا از هر صفحه‌ای به خانه اپ برمی‌گردید.", target: ".customer-header .brand" },
+                { title: "به سالن خوش آمدید ✨", content: "اینجا فضای شخصی شماست؛ خدمات را می‌بینید، متخصص دلخواهتان را انتخاب می‌کنید و نوبت می‌گیرید.", target: document.body },
+                { title: "هویت سالن", content: "با لمس لوگوی سالن از هر صفحه‌ای به خانه اپ برمی‌گردید.", target: ".customer-header .brand" },
                 { title: "مسیرهای اصلی", content: "خدمات، نوبت‌های شما و پروفایل همیشه از این نوار در دسترس‌اند.", target: mobile ? ".customer-bottom-nav" : ".customer-desktop-nav" },
                 { title: "فضای اصلی شما", content: "محتوای هر بخش اینجا نمایش داده می‌شود. برای رزرو، از صفحه خدمات شروع کنید.", target: mobile ? document.body : "#main-content" },
                 { title: "حساب و اعلان‌ها", content: "از این قسمت اعلان‌ها، اطلاعات حساب و خروج را مدیریت کنید. حالا همه‌چیز برای شروع آماده است.", target: ".header-account" },

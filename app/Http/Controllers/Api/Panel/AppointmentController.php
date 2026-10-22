@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AppointmentResource;
 use App\Models\Appointment;
 use App\Notifications\AppointmentChanged;
+use App\Services\Aftercare\CompleteAppointment;
 use App\Services\Appointments\AppointmentAvailability;
 use App\Services\Appointments\BookAppointment;
 use App\Services\Appointments\ExpirePastAppointments;
@@ -21,26 +22,30 @@ use Illuminate\Validation\Rule;
 
 class AppointmentController extends Controller
 {
-    public function options(CurrentSalon $context): JsonResponse
+    public function options(Request $request, CurrentSalon $context): JsonResponse
     {
         $salon = $context->get();
         $customers = $salon->users()->wherePivot('role', SalonRole::Customer->value)->wherePivot('is_active', true)
             ->get(['users.id', 'users.name', 'users.mobile'])->map(fn ($user) => ['id' => $user->id, 'name' => $user->name, 'mobile' => $user->mobile]);
         $services = $salon->services()->where('is_active', true)
-            ->with(['providers' => fn ($query) => $query->where('salon_user.is_active', true)->with('user:id,name')])->get()
+            ->with(['providers' => fn ($query) => $query
+                ->where('salon_user.role', SalonRole::Employee->value)
+                ->where('salon_user.is_active', true)
+                ->whereHas('user', fn ($user) => $user->where('is_active', true))
+                ->with('user:id,name')])->get()
             ->map(fn ($service) => [
                 'id' => $service->id, 'name' => $service->name, 'duration_minutes' => $service->duration_minutes, 'price' => $service->price,
                 'providers' => $service->providers->map(fn ($provider) => ['membership_id' => $provider->id, 'name' => $provider->user->name])->values(),
             ]);
 
-        return response()->json(['data' => ['customers' => $customers, 'services' => $services]]);
+        return response()->json(['data' => ['customers' => $customers, 'services' => $services, 'can_view_all' => $request->user()->canViewAllAppointmentsIn($salon->id)]]);
     }
 
     public function index(Request $request, CurrentSalon $context, ExpirePastAppointments $expiration)
     {
         $expiration->handle(salonId: $context->get()->id);
         $filters = $request->validate(['date' => ['nullable', 'date_format:Y-m-d'], 'status' => ['nullable', Rule::enum(AppointmentStatus::class)]]);
-        $query = $context->get()->appointments()->with(['salon.appointmentSetting', 'customer', 'items.provider.user'])->orderByDesc('starts_at');
+        $query = $context->get()->appointments()->visibleTo($request->user(), $context->get()->id)->with(['salon.appointmentSetting', 'customer', 'items.provider.user'])->orderByDesc('starts_at');
         if ($filters['date'] ?? null) {
             $timezone = $context->get()->appointmentSetting?->timezone ?? 'Asia/Tehran';
             $start = CarbonImmutable::createFromFormat('Y-m-d H:i', $filters['date'].' 00:00', $timezone)->utc();
@@ -68,10 +73,10 @@ class AppointmentController extends Controller
         return new AppointmentResource($booking->create($context->get(), $customer, $request->user(), $data, 'panel'));
     }
 
-    public function show(Appointment $appointment, CurrentSalon $context, ExpirePastAppointments $expiration): AppointmentResource
+    public function show(Request $request, Appointment $appointment, CurrentSalon $context, ExpirePastAppointments $expiration): AppointmentResource
     {
         $expiration->handle(salonId: $context->get()->id);
-        $appointment = $context->get()->appointments()->whereKey($appointment->id)->firstOrFail();
+        $appointment = $context->get()->appointments()->visibleTo($request->user(), $context->get()->id)->whereKey($appointment->id)->firstOrFail();
 
         return new AppointmentResource($appointment->load(['salon.appointmentSetting', 'customer', 'items.provider.user']));
     }
@@ -79,8 +84,13 @@ class AppointmentController extends Controller
     public function status(Request $request, Appointment $appointment, CurrentSalon $context, ExpirePastAppointments $expiration): AppointmentResource
     {
         $expiration->handle(salonId: $context->get()->id);
-        $appointment = $context->get()->appointments()->whereKey($appointment->id)->firstOrFail();
+        $appointment = $context->get()->appointments()->visibleTo($request->user(), $context->get()->id)->whereKey($appointment->id)->firstOrFail();
         $data = $request->validate(['status' => ['required', Rule::in(['completed', 'no_show', 'cancelled'])], 'reason' => ['nullable', 'string', 'max:1000']]);
+        if ($data['status'] === 'completed') {
+            $appointment = app(CompleteAppointment::class)->handle($appointment, $request->user());
+
+            return new AppointmentResource($appointment->load(['salon.appointmentSetting', 'customer', 'items.provider.user']));
+        }
         abort_unless($appointment->status === AppointmentStatus::Confirmed, 422, 'تغییر وضعیت از حالت فعلی مجاز نیست.');
         $appointment->update(['status' => $data['status'], ...($data['status'] === 'cancelled' ? ['cancellation_reason' => $data['reason'] ?? null, 'cancelled_by_id' => $request->user()->id, 'cancelled_at' => now()] : [])]);
         if ($data['status'] === 'cancelled') {
@@ -94,7 +104,7 @@ class AppointmentController extends Controller
     public function reschedule(Request $request, Appointment $appointment, CurrentSalon $context, RescheduleAppointment $service, ExpirePastAppointments $expiration): AppointmentResource
     {
         $expiration->handle(salonId: $context->get()->id);
-        $appointment = $context->get()->appointments()->whereKey($appointment->id)->where('status', AppointmentStatus::Confirmed->value)->with(['salon', 'customer'])->firstOrFail();
+        $appointment = $context->get()->appointments()->visibleTo($request->user(), $context->get()->id)->whereKey($appointment->id)->where('status', AppointmentStatus::Confirmed->value)->with(['salon', 'customer'])->firstOrFail();
         $data = $this->data($request, true);
         $updated = $service->handle($appointment, $data);
         $updated->customer->notify(new AppointmentChanged('زمان نوبت شما تغییر کرد', 'زمان یا متخصص یکی از سرویس‌های نوبت شما توسط سالن تغییر کرد.', $updated->id));

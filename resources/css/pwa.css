@@ -1,0 +1,24 @@
+.pwa-install-page { display: grid; gap: 22px; max-width: 720px; margin-inline: auto; }
+.pwa-install-page > header { display: grid; gap: 7px; }
+.pwa-install-page > header p { font-size: 13px; }
+.pwa-install-card.MuiPaper-root { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; padding: 30px; border-color: var(--ara-border); border-radius: 22px; }
+.pwa-install-card > p { max-width: 400px; margin: 0; color: var(--ara-muted); font-size: 13px; line-height: 2; }
+.pwa-install-icon { width: 94px; height: 94px; display: grid; place-items: center; border-radius: 24px; background: var(--ara-rose); color: var(--ara-primary); overflow: hidden; }
+.pwa-install-icon img { width: 100%; height: 100%; object-fit: contain; }
+.pwa-install-card .MuiAlert-root { width: 100%; text-align: start; font-size: 13px; }
+.pwa-install-guide.MuiPaper-root { padding: 24px; border-radius: 18px; border-color: var(--ara-border); }
+.pwa-install-guide h2 { margin-bottom: 14px; }
+.pwa-install-guide ol { display: grid; gap: 16px; padding-inline-start: 20px; margin: 24px 0 0; font-size: 13px; line-height: 2; }
+.pwa-install-guide li svg { vertical-align: middle; color: var(--ara-primary); }
+.pwa-connectivity-note { display: flex; gap: 10px; color: var(--ara-muted); align-items: flex-start; }
+.pwa-connectivity-note > svg { flex-shrink: 0; margin-top: 4px; }
+.pwa-connectivity-note p { margin: 0; font-size: 12px; line-height: 2; }
+.pwa-install-hint { display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid var(--ara-border); padding: 13px 16px; border-radius: 14px; margin-block: 16px; background: var(--ara-blush); }
+.pwa-install-hint > span { display: flex; align-items: center; gap: 10px; }
+.pwa-install-hint strong { display: block; font-size: 12px; }
+.pwa-install-hint small { display: block; font-size: 10px; color: var(--ara-muted); margin-top: 4px; }
+.pwa-install-hint .MuiButton-root { flex-shrink: 0; font-size: 11px; }
+.pwa-update-notice { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; padding: 10px 16px; background: var(--ara-rose); border-bottom: 1px solid var(--ara-border); font-size: 12px; }
+.customer-footer .pwa-footer-link { color: var(--ara-primary); font-size: 12px; padding: 7px; }
+@media (max-width: 450px) { .pwa-install-card.MuiPaper-root { padding: 24px 16px; } .pwa-install-guide.MuiPaper-root { padding: 20px 16px; } .pwa-install-hint { flex-wrap: wrap; } }
+@media (display-mode: standalone) { .customer-shell { padding-top: env(safe-area-inset-top); } }

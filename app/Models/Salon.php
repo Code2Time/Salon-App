@@ -12,11 +12,11 @@ class Salon extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'is_active'];
+    protected $fillable = ['name', 'slug', 'is_active', 'logo', 'description', 'phone', 'address', 'instagram_url', 'telegram_url', 'whatsapp_url', 'website_url', 'aftercare_discount_validity_days'];
 
     protected function casts(): array
     {
-        return ['is_active' => 'boolean'];
+        return ['is_active' => 'boolean', 'aftercare_discount_validity_days' => 'integer'];
     }
 
     public function users(): BelongsToMany

@@ -10,10 +10,11 @@ use App\Services\Appointments\ExpirePastAppointments;
 use App\Services\CurrentSalon;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function __invoke(CurrentSalon $context, ExpirePastAppointments $expiration): JsonResponse
+    public function __invoke(Request $request, CurrentSalon $context, ExpirePastAppointments $expiration): JsonResponse
     {
         $salon = $context->get();
         $expiration->handle(salonId: $salon->id);
@@ -22,7 +23,7 @@ class DashboardController extends Controller
         $todayStart = $now->startOfDay()->utc();
         $tomorrowStart = $now->addDay()->startOfDay()->utc();
 
-        $todayAppointments = $salon->appointments()
+        $todayAppointments = $salon->appointments()->visibleTo($request->user(), $salon->id)
             ->where('starts_at', '>=', $todayStart)
             ->where('starts_at', '<', $tomorrowStart);
 
@@ -31,7 +32,7 @@ class DashboardController extends Controller
             ->groupBy('status')
             ->pluck('aggregate', 'status');
 
-        $upcoming = $salon->appointments()
+        $upcoming = $salon->appointments()->visibleTo($request->user(), $salon->id)
             ->where('starts_at', '>=', $now->utc())
             ->whereIn('status', [AppointmentStatus::Pending->value, AppointmentStatus::Confirmed->value])
             ->with(['customer:id,name,mobile', 'items.provider.user:id,name'])

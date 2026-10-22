@@ -1,4 +1,6 @@
+import { PwaProvider } from "../pwa/PwaContext";
 import { BrowserRouter } from "react-router";
+import { SalonProvider } from "../salon/SalonContext";
 import AppRoutes from "../routes/AppRoutes";
 import { AuthProvider } from "../auth/AuthContext";
 import { ToastContainer } from "react-toastify";
@@ -9,7 +11,7 @@ export default function App() {
     return (
         <BrowserRouter>
             <AuthProvider>
-                <AppRoutes />
+                <SalonProvider><PwaProvider><AppRoutes /></PwaProvider></SalonProvider>
                 <ToastContainer
                     position="top-center"
                     autoClose={4500}

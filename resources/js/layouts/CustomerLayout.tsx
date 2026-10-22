@@ -1,3 +1,5 @@
+import { AppUpdateNotice } from "../pwa/InstallHint";
+import { useSalon } from "../salon/SalonContext";
 import { Link, Outlet, useLocation } from "react-router";
 import { ArrowLeftRight, ArrowUpLeft, ChevronDown } from "lucide-react";
 import Brand from "../components/layout/Brand";
@@ -14,6 +16,7 @@ import CustomerOnboardingTour from "../components/customer/CustomerOnboardingTou
 import ColorModeToggle from "../components/layout/ColorModeToggle";
 
 export default function CustomerLayout() {
+    const { salon } = useSalon();
     const { pathname } = useLocation();
     const current = customerNavigation.find((item) => item.path === pathname);
     const { user, loading, logout } = useAuth();
@@ -31,6 +34,7 @@ export default function CustomerLayout() {
             <a className="skip-link" href="#main-content">
                 رفتن به محتوا
             </a>
+            <AppUpdateNotice />
             <header className="customer-header">
                 <div className="customer-header-inner">
                     <Brand customer />
@@ -54,8 +58,8 @@ export default function CustomerLayout() {
                                     <Avatar src={user.image_url ?? defaultAvatarUrl} alt={user.name} className="header-avatar" />
                                     <ChevronDown size={15} className="account-profile-chevron" aria-hidden="true" />
                                 </Link>
-                                <Button className="preview-return" color="inherit" onClick={handleLogout}>
-                                    خروج <ArrowUpLeft size={17} />
+                                <Button className="preview-return" color="inherit" aria-label="خروج از حساب" onClick={handleLogout}>
+                                    <span>خروج</span> <ArrowUpLeft size={17} />
                                 </Button>
                             </>
                         ) : !loading ? (
@@ -86,7 +90,8 @@ export default function CustomerLayout() {
             </main>
             <footer className="customer-footer">
                 با عشق به زیبایی، با احترام به زمان شما.
-                <span>آرا · سالن نمونه</span>
+                <span>{salon?.name}</span>
+                <Link className="pwa-footer-link" to="/app/install">نصب برنامه روی گوشی</Link>
             </footer>
             <Navigation
                 items={customerNavigation}

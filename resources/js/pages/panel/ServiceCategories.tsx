@@ -1,3 +1,4 @@
+import { useSalon } from "../../salon/SalonContext";
 import {
     Alert,
     Button,
@@ -43,6 +44,8 @@ const emptyForm: ServiceCategoryInput = {
 };
 
 export default function ServiceCategories() {
+    const { salon: salonDetails } = useSalon();
+    const salonLogo = salonDetails?.logo_url || logoUrl;
     const { user } = useAuth();
     const membership = user?.memberships[0];
     const canManage = user?.system_role === "super_admin"
@@ -210,7 +213,7 @@ export default function ServiceCategories() {
                     {categories.map((category) => (
                         <Paper variant="outlined" className="category-card" key={category.id}>
                             <div className={`category-cover${category.image_url ? "" : " is-default"}`}>
-                                <img src={category.image_url || logoUrl} alt={category.image_url ? `تصویر دسته‌بندی ${category.name}` : "لوگوی پیش‌فرض آرا"} />
+                                <img src={category.image_url || salonLogo} alt={category.image_url ? `تصویر دسته‌بندی ${category.name}` : "لوگوی پیش‌فرض سالن"} />
                                 <div className="category-badges">
                                     {category.is_featured && <Chip className="category-featured-chip" icon={<Sparkles size={14} />} label="ویژه" size="small" />}
                                     <Chip className={category.is_active ? "category-active-chip" : "category-inactive-chip"} label={category.is_active ? "فعال" : "غیرفعال"} size="small" />
@@ -239,7 +242,7 @@ export default function ServiceCategories() {
                     <DialogTitle>{editing ? "ویرایش دسته‌بندی" : "ایجاد دسته‌بندی"}</DialogTitle>
                     <DialogContent className="category-form">
                         <div className="category-image-field">
-                            <div className={`category-image-preview${imagePreview ? "" : " is-default"}`}><img src={imagePreview || logoUrl} alt={imagePreview ? "پیش‌نمایش دسته‌بندی" : "لوگوی پیش‌فرض آرا"} /></div>
+                            <div className={`category-image-preview${imagePreview ? "" : " is-default"}`}><img src={imagePreview || salonLogo} alt={imagePreview ? "پیش‌نمایش دسته‌بندی" : "لوگوی پیش‌فرض سالن"} /></div>
                             <div><Button component="label" color="inherit"><ImagePlus size={17} /> انتخاب تصویر<input hidden type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => { const file = event.target.files?.[0]; if (!file) return; setForm({ ...form, image: file }); setImagePreview(URL.createObjectURL(file)); }} /></Button><span>JPG، PNG یا WebP؛ حداکثر ۲ مگابایت</span></div>
                         </div>
                         <TextField label="نام دسته‌بندی" required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />

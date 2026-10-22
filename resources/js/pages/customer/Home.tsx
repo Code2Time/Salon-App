@@ -1,6 +1,15 @@
+import { InstallHint } from "../../pwa/InstallHint";
+import { useSalon } from "../../salon/SalonContext";
+import "../../../css/salon-settings.css";
 import { Button, Paper, Typography } from "@mui/material";
 import {
     ArrowLeft,
+    Phone,
+    MapPin,
+    Camera,
+    Send,
+    Globe,
+    MessageCircle,
     Flower2,
     Heart,
     Sparkles,
@@ -9,14 +18,17 @@ import {
 import { Link } from "react-router";
 
 export default function Home() {
+    const { salon } = useSalon();
+    const socialLinks = [{ url: salon?.instagram_url, label: "اینستاگرام", Icon: Camera }, { url: salon?.telegram_url, label: "تلگرام", Icon: Send }, { url: salon?.whatsapp_url, label: "واتساپ", Icon: MessageCircle }, { url: salon?.website_url, label: "وب‌سایت", Icon: Globe }].filter(link => link.url);
     return (
         <section>
             <div className="customer-greeting">
-                <span className="eyebrow">به آرا خوش آمدید</span>
+                <span className="eyebrow">به {salon?.name ?? "سالن"} خوش آمدید</span>
                 <Typography component="h1" variant="h2">
                     امروز، کمی برای خودتان.
                 </Typography>
             </div>
+            <InstallHint />
             <Paper className="customer-hero">
                 <div className="hero-copy">
                     <span className="eyebrow">لحظه‌ای برای درخشیدن</span>
@@ -25,10 +37,8 @@ export default function Home() {
                         <br />
                         خوب شما شروع می‌شود.
                     </Typography>
-                    <Typography>
-                        یک مکث دلنشین در میان روزهای شلوغ؛
-                        <br />
-                        این زمان، فقط برای شماست.
+                    <Typography className="salon-public-description">
+                        {salon?.description || "زمانی برای رسیدگی به زیبایی و حال خوب شما."}
                     </Typography>
                     <Button
                         component={Link}
@@ -38,7 +48,7 @@ export default function Home() {
                         مشاهده خدمات <ArrowLeft size={19} />
                     </Button>
                     <span className="hero-caption">
-                        معرفی نمایشی سالن زیبایی آرا
+                        {salon?.name}
                     </span>
                 </div>
                 <div className="customer-art" aria-hidden="true">
@@ -110,10 +120,8 @@ export default function Home() {
                     <ArrowLeft size={20} />
                 </Paper>
             </div>
-            <p className="preview-notice">
-                این یک پیش‌نمایش از فضای مشتری است. اطلاعات سالن نمایشی است و
-                رزرو واقعی هنوز فعال نیست.
-            </p>
+            {(salon?.phone || salon?.address || socialLinks.length > 0) && <Paper variant="outlined" className="salon-public-contact"><Typography component="h2" variant="h3">ارتباط با {salon?.name}</Typography>{salon?.address && <p><MapPin size={18} /><span>{salon.address}</span></p>}{salon?.phone && <div className="salon-public-links"><a href={`tel:${salon.phone.replace(/[()\s-]/g, "")}`}><Phone size={17} /><bdi>{salon.phone}</bdi></a></div>}<div className="salon-public-links">{socialLinks.map(({url, label, Icon}) => <a key={label} href={url!} target="_blank" rel="noopener noreferrer"><Icon size={17} />{label}</a>)}</div></Paper>}
+
         </section>
     );
 }

@@ -1,3 +1,4 @@
+import { useSalon } from "../../salon/SalonContext";
 import { Alert, Avatar, Button, CircularProgress, IconButton, MenuItem, Paper, Select, TextField, Typography } from "@mui/material";
 import { ArrowDown, ArrowLeft, ArrowUp, CalendarDays, Check, CheckCircle2, Clock3, Plus, Scissors, Sparkles, Trash2, UserRound, WalletCards } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -26,6 +27,8 @@ function displayDate(value: string): string {
 }
 
 export default function CustomerBooking() {
+    const { salon: salonDetails } = useSalon();
+    const salonLogo = salonDetails?.logo_url || logoUrl;
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const requestedServiceId = Number(searchParams.get("service"));
@@ -185,7 +188,7 @@ export default function CustomerBooking() {
                                 const service = services.find((entry) => entry.id === item.service_id)!;
                                 return <article className="booking-service-item" key={`${item.service_id}-${index}`}>
                                     <div className="booking-service-head">
-                                        <div className="booking-service-image"><img src={service.categories[0]?.image_url || logoUrl} alt={service.categories[0]?.image_url ? service.name : "لوگوی آرا"} /></div>
+                                        <div className="booking-service-image"><img src={service.categories[0]?.image_url || salonLogo} alt={service.categories[0]?.image_url ? service.name : "لوگوی سالن"} /></div>
                                         <div><span>خدمت {numberFormat.format(index + 1)}</span><Typography variant="h3">{service.name}</Typography><small>{numberFormat.format(service.duration_minutes)} دقیقه · {numberFormat.format(service.price)} تومان</small></div>
                                         <div className="booking-item-actions">
                                             <IconButton aria-label="انتقال به بالا" disabled={index === 0} onClick={() => moveItem(index, -1)}><ArrowUp size={17} /></IconButton>

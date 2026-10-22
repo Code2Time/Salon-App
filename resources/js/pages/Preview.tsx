@@ -1,15 +1,17 @@
+import { useSalon } from "../salon/SalonContext";
 import { Button, Paper, Typography } from "@mui/material";
 import { ArrowLeft, LayoutDashboard, Smartphone } from "lucide-react";
 import { Link } from "react-router";
 import Brand from "../components/layout/Brand";
 
 export default function Preview() {
+    const { salon } = useSalon();
     return (
         <main className="preview-page">
             <Brand />
             <span className="eyebrow">یک تجربه، دو فضای متفاوت</span>
             <Typography variant="h1" component="h1">
-                به آرا خوش آمدید
+                به {salon?.name ?? "سالن"} خوش آمدید
             </Typography>
             <Typography color="text.secondary">
                 فضای موردنظرتان را برای پیش‌نمایش انتخاب کنید.
